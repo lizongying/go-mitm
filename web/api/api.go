@@ -57,8 +57,8 @@ func (a *Api) action(_ http.ResponseWriter, r *http.Request) {
 
 	return
 }
-func (a *Api) event(w http.ResponseWriter, _ *http.Request) {
-	fmt.Println("new event")
+func (a *Api) event(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r.URL.String())
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")

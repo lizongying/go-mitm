@@ -29,7 +29,7 @@
     >
       <template #headerCell="{ column }">
         <template
-            v-if="['url', 'method', 'type', 'status', 'time', 'size'].includes(column.dataIndex)">
+            v-if="['url', 'method', 'type', 'status', 'time', 'size', 'action'].includes(column.dataIndex)">
         <span style="font-weight: bold">
             {{
             column.dataIndex.charAt(0).toUpperCase()
@@ -549,9 +549,9 @@ const clear = () => {
 
 // export data
 const out = () => {
-  const text = ['method,host,path,status']
+  const text = ['Url,Type,Method,Status,Time,Size']
   data.value.forEach((i) => {
-    text.push([i.method, i.host, i.path, i.status].join(','))
+    text.push([i.url, i.type, i.method, i.status, i.time, t.size].join(','))
   })
   const file = new File([text.join('\n')], 'go_mitm.csv', {
     type: 'text/csv',
