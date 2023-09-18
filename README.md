@@ -34,19 +34,27 @@ windows:
 ### Set the proxy
 
 设置代理为 http://localhost:8082
+
+mac:
+
 ![image](./screenshot/img_6.png)
+
+windows:
+
+![image](./screenshot/img_12.png)
+![image](./screenshot/img_13.png)
 
 ### Run
 
 执行程序
-mac: 
+mac:
 
-[mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_darwin_arm64) 
+[mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_darwin_arm64)
 [mitm_darwin_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_darwin_amd64)
 
-linux: 
+linux:
 
-[mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_linux_arm64) 
+[mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_linux_arm64)
 [mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_linux_amd64)
 
 windows:
