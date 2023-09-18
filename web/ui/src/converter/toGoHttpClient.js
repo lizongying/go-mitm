@@ -41,8 +41,9 @@ func main() {`
         
 	// Set request headers.`
         Object.entries(header).forEach((v) => {
+            const value = v[1].replaceAll(/"/g, '\\"')
             template += `
-	req.Header.Set("${v[0]}", "${v[1]}")`
+	req.Header.Set("${v[0]}", "${value}")`
         })
     }
 

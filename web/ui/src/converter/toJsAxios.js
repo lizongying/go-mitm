@@ -1,4 +1,4 @@
-const toAxios = (url, method, header, body) => {
+const toJsAxios = (url, method, header, body) => {
     let template = `// ES6 module
 import axios from 'axios';
 
@@ -46,7 +46,8 @@ axios.get('${url}'`
 		headers: {`
         let headers = []
         Object.entries(header).forEach((v) => {
-            headers.push(`'${v[0]}': '${v[1]}'`)
+            const value = v[1].replaceAll(/'/g, '\\\'')
+            headers.push(`'${v[0]}': '${value}'`)
         })
         template += `
 		    ${headers.join(',\n		    ')}`
@@ -66,4 +67,4 @@ axios.get('${url}'`
 }
 
 
-export {toAxios}
+export {toJsAxios}

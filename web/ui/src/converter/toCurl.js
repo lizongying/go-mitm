@@ -15,8 +15,9 @@ const toCurl = (url, method, header, body) => {
 
     if (header != null && typeof header === 'object') {
         Object.entries(header).forEach((v) => {
+            const value = v[1].replaceAll(/'/g, '\\\'')
             template += `
--H '${v[0]}: ${v[1]}' \\`
+-H '${v[0]}: ${value}' \\`
         })
     }
 

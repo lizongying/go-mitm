@@ -27,8 +27,9 @@ func main() {
         template += `.
 		SetHeaders(map[string]string{`
         Object.entries(header).forEach((v) => {
+            const value = v[1].replaceAll(/"/g, '\\"')
             template += `
-			"${v[0]}": "${v[1]}",`
+			"${v[0]}": "${value}",`
         })
         template += `
 		})`

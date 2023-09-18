@@ -1,4 +1,4 @@
-const toJQuery = (url, method, header, body) => {
+const toJsJQuery = (url, method, header, body) => {
     let template = `$.ajax({`
 
     if (typeof url === 'string' && url !== '') {
@@ -22,7 +22,8 @@ const toJQuery = (url, method, header, body) => {
 	headers: {`
         let headers = []
         Object.entries(header).forEach((v) => {
-            headers.push(`'${v[0]}': '${v[1]}'`)
+            const value = v[1].replaceAll(/'/g, '\\\'')
+            headers.push(`'${v[0]}': '${value}'`)
         })
         template += `
 		${headers.join(',\n		')}`
@@ -45,4 +46,4 @@ const toJQuery = (url, method, header, body) => {
 }
 
 
-export {toJQuery}
+export {toJsJQuery}

@@ -176,22 +176,22 @@
           <a-collapse v-model:activeKey="activeKeyJs" :bordered="false">
             <a-collapse-panel key="1" header="fetch">
               <PreviewCode
-                  :code="toFetch(message.url, message.method, message.req_header, message.req_body)"
+                  :code="toJsFetch(message.url, message.method, message.req_header, message.req_body)"
                   type="javascript" line-numbers></PreviewCode>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="xhr">
               <PreviewCode
-                  :code="toXhr(message.url, message.method, message.req_header, message.req_body)"
+                  :code="toJsXhr(message.url, message.method, message.req_header, message.req_body)"
                   type="javascript" line-numbers></PreviewCode>
             </a-collapse-panel>
             <a-collapse-panel key="3" header="ajax">
               <PreviewCode
-                  :code="toJQuery(message.url, message.method, message.req_header, message.req_body)"
+                  :code="toJsJQuery(message.url, message.method, message.req_header, message.req_body)"
                   type="javascript" line-numbers></PreviewCode>
             </a-collapse-panel>
             <a-collapse-panel key="4" header="axios">
               <PreviewCode
-                  :code="toAxios(message.url, message.method, message.req_header, message.req_body)"
+                  :code="toJsAxios(message.url, message.method, message.req_header, message.req_body)"
                   type="javascript" line-numbers></PreviewCode>
             </a-collapse-panel>
           </a-collapse>
@@ -246,7 +246,7 @@
                            type="java" line-numbers></PreviewCode>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="ApacheHttpClient">
-              <PreviewCode :code="toApacheHttpClient(message.url, message.method, message.req_header, message.req_body)"
+              <PreviewCode :code="toJavaApacheHttpClient(message.url, message.method, message.req_header, message.req_body)"
                            type="java" line-numbers></PreviewCode>
             </a-collapse-panel>
             <a-collapse-panel key="3" header="OKhttp">
@@ -294,10 +294,10 @@ import {formatHexDump} from '../utils'
 import PreviewCode from '../components/PreviewCode.vue'
 import PreviewHeader from "../components/PreviewHeader.vue";
 import {toCurl} from "../converter/toCurl";
-import {toJQuery} from "../converter/toJQuery";
-import {toXhr} from "../converter/toXhr";
-import {toFetch} from "../converter/toFetch";
-import {toAxios} from "../converter/toAxios";
+import {toJsJQuery} from "../converter/toJsJQuery";
+import {toJsXhr} from "../converter/toJsXhr";
+import {toJsFetch} from "../converter/toJsFetch";
+import {toJsAxios} from "../converter/toJsAxios";
 import {toGoHttpClient} from "../converter/toGoHttpClient";
 import {toGoGoCrawler} from "../converter/toGoGoCrawler";
 import {toPHPcURL} from "../converter/toPHPcURL";
@@ -309,7 +309,7 @@ import {toPyaiohttp} from "../converter/toPyaiohttp";
 import {toPyhttpx} from "../converter/toPyhttpx";
 import {toJavaHttpClient} from "@/converter/toJavaHttpClient";
 import {toJavaJsoup} from "@/converter/toJavaJsoup";
-import {toApacheHttpClient} from "@/converter/toApacheHttpClient";
+import {toJavaApacheHttpClient} from "@/converter/toJavaApacheHttpClient";
 import {toJavaOkHttp} from "@/converter/toJavaOkHttp";
 
 // record

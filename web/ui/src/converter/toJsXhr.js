@@ -1,4 +1,4 @@
-const toXhr = (url, method, header, body) => {
+const toJsXhr = (url, method, header, body) => {
     let template = `const xhr = new XMLHttpRequest();`
 
     if (typeof url === 'string' && url !== '') {
@@ -18,8 +18,9 @@ xhr.open('GET', '${url}');`
 
     if (header != null && typeof header === 'object') {
         Object.entries(header).forEach((v) => {
+            const value = v[1].replaceAll(/'/g, '\\\'')
             template += `
-xhr.setRequestHeader('${v[0]}', '${v[1]}');`
+xhr.setRequestHeader('${v[0]}', '${value}');`
         })
     }
 
@@ -41,4 +42,4 @@ xhr.send(null);`
 }
 
 
-export {toXhr}
+export {toJsXhr}

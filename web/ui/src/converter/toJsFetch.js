@@ -1,4 +1,4 @@
-const toFetch = (url, method, header, body) => {
+const toJsFetch = (url, method, header, body) => {
     let template = `fetch(`
 
     if (typeof url === 'string' && url !== '') {
@@ -30,7 +30,8 @@ const toFetch = (url, method, header, body) => {
 	headers: {`
         let headers = []
         Object.entries(header).forEach((v) => {
-            headers.push(`'${v[0]}': '${v[1]}'`)
+            const value = v[1].replaceAll(/'/g, '\\\'')
+            headers.push(`'${v[0]}': '${value}'`)
         })
         template += `
 		${headers.join(',\n		')}`
@@ -57,4 +58,4 @@ const toFetch = (url, method, header, body) => {
 }
 
 
-export {toFetch}
+export {toJsFetch}

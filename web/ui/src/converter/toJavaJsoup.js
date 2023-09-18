@@ -26,8 +26,9 @@ public class JsoupExample {
 
 		if (header != null && typeof header === 'object') {
 				Object.entries(header).forEach((v) => {
+					const value = v[1].replaceAll(/"/g, '\\"')
 						template += `
-			.header("${v[0]}", "${v[1]}")`
+			.header("${v[0]}", "${value}")`
 				})
 		}
 

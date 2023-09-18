@@ -1,4 +1,4 @@
-const toApacheHttpClient = (url, method, header, body) => {
+const toJavaApacheHttpClient = (url, method, header, body) => {
 		let template = `package org.example;
 
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
@@ -72,8 +72,9 @@ public class ApacheHttpClient {
 
 		if (header != null && typeof header === 'object') {
 				Object.entries(header).forEach((v) => {
+					const value = v[1].replaceAll(/"/g, '\\"')
 						template += `
-		request.setHeader("${v[0]}", "${v[1]}");`
+		request.setHeader("${v[0]}", "${value}");`
 				})
 		}
 
@@ -99,4 +100,4 @@ public class ApacheHttpClient {
 }
 
 
-export {toApacheHttpClient}
+export {toJavaApacheHttpClient}

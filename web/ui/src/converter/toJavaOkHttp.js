@@ -31,8 +31,9 @@ public class Okhttp3Example {
 
     if (header != null && typeof header === 'object') {
         Object.entries(header).forEach((v) => {
+            const value = v[1].replaceAll(/"/g, '\\"')
             template += `
-			.addHeader("${v[0]}", "${v[1]}")`
+			.addHeader("${v[0]}", "${value}")`
         })
     }
 
