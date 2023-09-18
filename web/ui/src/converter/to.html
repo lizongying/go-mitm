@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<pre id="e0"></pre>
+<hr>
+<pre id="e1"></pre>
+<hr>
+<pre id="e2"></pre>
+<hr>
+<pre id="e3"></pre>
+<hr>
+<pre id="e4"></pre>
+<hr>
+<pre id="e5"></pre>
+<hr>
+<pre id="e6"></pre>
+<hr>
+<pre id="e7"></pre>
+<hr>
+<pre id="e8"></pre>
+<hr>
+<pre id="e9"></pre>
+<hr>
+<pre id="e10"></pre>
+<hr>
+<pre id="e11"></pre>
+<hr>
+<pre id="e12"></pre>
+<hr>
+<pre id="e13"></pre>
+<hr>
+<pre id="e14"></pre>
+<hr>
+<pre id="e15"></pre>
+<hr>
+</body>
+<script type="module">
+    // import {toAxios as to} from './toAxios.js'
+    // import {toCurl as to} from './toCurl.js'
+    // import {toFetch as to} from './toFetch.js'
+    // import {toGoGoCrawler as to} from './toGoGoCrawler.js'
+    // import {toGoHttpClient as to} from './toGoHttpClient.js'
+    // import {toJQuery as to} from './toJQuery.js'
+    // import {toXhr as to} from './toXhr.js'
+    // import {toPHPcURL as to} from './toPHPcURL.js'
+    // import {toPHPGuzzle as to} from './toPHPGuzzle.js'
+    // import {toPyRequests as to} from './toPyRequests.js'
+    // import {toPyhttpx as to} from './toPyhttpx.js'
+    // import {toPyurllib3 as to} from './toPyurllib3.js'
+    // import {toPyurllib as to} from './toPyurllib.js'
+    // import {toPyaiohttp as to} from './toPyaiohttp.js'
+    import {toJavaOkHttp as to} from './toJavaOkHttp.js'
+    // import {toJavaJsoup as to} from './toJavaJsoup.js'
+    // import {toApacheHttpClient as to} from './toApacheHttpClient.js'
+    // import {toJavaHttpClient as to} from './toJavaHttpClient.js'
+
+    const all = [
+        [0, 0, 0, 0],
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1],
+        [1, 1, 0, 0],
+        [1, 0, 1, 0],
+        [1, 0, 0, 1],
+        [0, 1, 1, 0],
+        [0, 1, 0, 1],
+        [0, 0, 1, 1],
+        [1, 1, 1, 0],
+        [1, 1, 0, 1],
+        [1, 0, 1, 1],
+        [0, 1, 1, 1],
+        [1, 1, 1, 1],
+    ]
+
+    let url = 'https://httpbin.org/post'
+    let method = 'POST'
+    let header = {a: '1', b: '2'}
+    let body = '{"c":1\'`}'
+    let p = [url, method, header, body]
+
+    let r = ''
+    for (let i = 0; i < 16; i++) {
+        r = to(
+            all[i][0] === 1 ? p[0] : null,
+            all[i][1] === 1 ? p[1] : null,
+            all[i][2] === 1 ? p[2] : null,
+            all[i][3] === 1 ? p[3] : null)
+        console.log(r)
+        r = r.replace(/<\?/, '&lt;?')
+        r = r.replace(/<String>/, '&lt;String&gt;')
+        r = r.replace(/<CloseableHttpResponse>/, '&lt;CloseableHttpResponse&gt;')
+        r = all[i].toString() + '\n' + r
+        document.querySelector('#e' + i).innerHTML = r
+    }
+
+    // r = to(...p)
+    // document.querySelector('#e' + 0).innerHTML = r
+
+</script>
+</html>
