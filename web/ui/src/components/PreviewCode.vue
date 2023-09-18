@@ -24,7 +24,6 @@ const lineNumbers = computed(() => {
   return props.lineNumbers ? 'line-numbers' : ''
 });
 const html = computed(() => {
-  console.log("props.code", props.code)
   return props.code == null ? '' : Prism.highlight(props.code, Prism.languages[props.type], props.type)
 });
 onMounted(() => {

@@ -8,15 +8,17 @@
 
 1. 当前设备安装并信任CA证书 [ca.crt](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/ca.crt)
    ![image](./screenshot/img_5.png)
+
 2. 执行程序
-
-   windows: [mitm_windows_amd64.exe](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_windows_amd64.exe)
-
    mac: [mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_darwin_arm64) [mitm_darwin_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_darwin_amd64)
 
    linux: [mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_linux_arm64) [mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_linux_amd64)
+
+   windows: [mitm_windows_amd64.exe](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_windows_amd64.exe)
+
 3. 设置代理为 http://localhost:8082
    ![image](./screenshot/img_6.png)
+
 4. 访问界面 http://localhost:8083
 
    ![image](./screenshot/img.png)

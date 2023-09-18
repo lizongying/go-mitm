@@ -287,7 +287,7 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		p.logger.Info("Response", "StatusCode", response.StatusCode, r.Method, r.URL.String(), "contentType", contentType)
+		//p.logger.Info("Response", "StatusCode", response.StatusCode, r.Method, r.URL.String(), "contentType", contentType)
 
 		p.messageChan <- &api.Message{
 			Url:         r.URL.String(),

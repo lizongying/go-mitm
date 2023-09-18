@@ -1,11 +1,12 @@
 <template>
-    <pre class="language-md"><code class="language-md"><span v-for="{k, v} in headers" key="k">{{ k }}: {{
+    <pre class="language-java"><code class="language-java"><span v-for="{k, v} in headers" key="k">{{ k }}: {{
         v
         }}
 </span></code></pre>
 </template>
 <script setup>
-import {computed} from 'vue'
+import {computed, onMounted} from 'vue'
+import Prism from "prismjs";
 
 const props = defineProps({
     header: {},
@@ -20,4 +21,7 @@ const headers = computed(() => {
     })
     return arr
 })
+onMounted(() => {
+  Prism.highlightAll()
+});
 </script>

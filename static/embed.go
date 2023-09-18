@@ -5,10 +5,10 @@ import (
 	_ "embed"
 )
 
-//go:embed tls/ca_crt.pem
+//go:embed tls/ca.crt
 var CaCert []byte
 
-//go:embed tls/ca_key.pem
+//go:embed tls/ca.key
 var CaKey []byte
 
 //go:embed dist
