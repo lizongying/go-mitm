@@ -18,7 +18,7 @@
 
 ### Install certificate
 
-当前设备安装并信任CA证书 [ca.crt](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/ca.crt)
+当前设备安装并信任CA证书 [ca.crt](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/ca.crt)
 
 mac:
 
@@ -39,15 +39,23 @@ windows:
 ### Run
 
 执行程序
-mac: [mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_darwin_arm64) [mitm_darwin_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_darwin_amd64)
+mac: 
 
-linux: [mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_linux_arm64) [mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_linux_amd64)
+[mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_darwin_arm64) 
+[mitm_darwin_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_darwin_amd64)
 
-windows: [mitm_windows_amd64.exe](https://github.com/lizongying/go-mitm/releases/download/v0.0.2/mitm_windows_amd64.exe)
+linux: 
+
+[mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_linux_arm64) 
+[mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_linux_amd64)
+
+windows:
+
+[mitm_windows_amd64.exe](https://github.com/lizongying/go-mitm/releases/download/v0.0.3/mitm_windows_amd64.exe)
 
 ### Open the link
 
-访问界面 http://localhost:8083
+访问链接 http://localhost:8083
 
 ![image](./screenshot/img.png)
 ![image](./screenshot/img_1.png)
