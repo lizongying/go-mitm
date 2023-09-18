@@ -1,6 +1,6 @@
 .PHONY: all
 
-all: ui tidy mitm-web mitm-more
+all: ui tidy mitm-web
 
 shell:
 	@echo 'SHELL='$(SHELL)
@@ -13,10 +13,6 @@ tidy:
 	go mod tidy
 
 mitm-web:
-	go vet ./cmd/mitm-web
-	go build -ldflags "-s -w" -o ./releases/mitm ./cmd/mitm-web
-
-mitm-more:
 	go vet ./cmd/mitm-web
 
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-s -w" -o ./releases/mitm_linux_amd64 ./cmd/mitm-web
