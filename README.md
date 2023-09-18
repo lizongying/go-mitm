@@ -6,8 +6,9 @@
 
 ## Usage
 
-1. 当前设备信任ca证书 ./static/tls/ca_crt.pem或./static/tls/ca.crt
-2. 执行程序 ./releases/mitm
+1. 当前设备安装并信任CA证书 [ca.crt](https://github.com/lizongying/go-mitm/releases/download/v0.0.1/ca.crt)
+   ![image](./screenshot/img_5.png)
+2. 执行程序
 
    windows: [mitm_windows_amd64.exe](https://github.com/lizongying/go-mitm/releases/download/v0.0.1/mitm_windows_amd64.exe)
 
@@ -15,13 +16,14 @@
 
    linux: [mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.1/mitm_linux_arm64) [mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.1/mitm_linux_amd64)
 3. 设置代理为 http://localhost:8082
+   ![image](./screenshot/img_6.png)
 4. 访问界面 http://localhost:8083
 
-![image](./screenshot/img.png)
-![image](./screenshot/img_1.png)
-![image](./screenshot/img_4.png)
-![image](./screenshot/img_2.png)
-![image](./screenshot/img_3.png)
+   ![image](./screenshot/img.png)
+   ![image](./screenshot/img_1.png)
+   ![image](./screenshot/img_4.png)
+   ![image](./screenshot/img_2.png)
+   ![image](./screenshot/img_3.png)
 
 ## Dev
 
@@ -45,15 +47,7 @@ make
 
 ## TODO
 
-* python
-* http.client
-
-* node
-* request
-* https
-
+* python http.client
+* node https/request
 * java
-
-* middleware
-* tmpdir
-* save image/video
+* middleware tmpdir save image/video
