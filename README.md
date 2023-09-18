@@ -9,11 +9,11 @@
 1. 当前设备信任ca证书 ./static/tls/ca_crt.pem或./static/tls/ca.crt
 2. 执行程序 ./releases/mitm
 
-   windows: ./releases/mitm_windows_amd64.exe
+   windows: [mitm_windows_amd64.exe](https://github.com/lizongying/go-mitm/releases/download/v0.0.1/mitm_windows_amd64.exe)
 
-   mac: ./releases/mitm_darwin_arm64 ./releases/mitm_darwin_amd64
+   mac: [mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.1/mitm_darwin_arm64) [mitm_darwin_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.1/mitm_darwin_amd64)
 
-   linux: ./releases/mitm_linux_arm64 ./releases/mitm_linux_amd64
+   linux: [mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.1/mitm_linux_arm64) [mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.1/mitm_linux_amd64)
 3. 设置代理为 http://localhost:8082
 4. 访问界面 http://localhost:8083
 
