@@ -6,8 +6,8 @@ import (
 )
 
 func main() {
-	mux := api.NewApi().Mux()
-	handler := api.CrossDomain(mux)
+	handler := api.NewApi(nil, nil, nil, nil, nil, nil, nil).Handler()
+	handler = api.CrossDomain(handler)
 	srv := &http.Server{
 		Addr:    ":8083",
 		Handler: handler,

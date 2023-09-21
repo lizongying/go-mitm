@@ -3,25 +3,25 @@ package main
 import (
 	"crypto/tls"
 	"flag"
+	"fmt"
 	"github.com/lizongying/go-mitm/mitm"
 	"net/http"
 )
 
 func main() {
-	filterPtr := flag.String("f", "", "-f filter")
-	replacePtr := flag.Bool("r", false, "-r replace")
-	proxyPtr := flag.String("p", "", "-p proxy")
+	midPortPtr := flag.Int("mid-port", 8082, "-mid-port proxyPort")
+	includePtr := flag.String("include", "", "-include include")
+	excludePtr := flag.String("exclude", "localhost;127.0.0.1", "-exclude exclude")
+	proxyPtr := flag.String("proxy", "", "-proxy proxy")
 	flag.Parse()
 
-	//*replacePtr = true
-	//*filterPtr = "baidu"
-	p, err := mitm.NewProxy(*filterPtr, *proxyPtr, *replacePtr)
+	p, err := mitm.NewProxy(*includePtr, *excludePtr, *proxyPtr)
 	if err != nil {
 		return
 	}
 
 	srv := &http.Server{
-		Addr:         ":8082",
+		Addr:         fmt.Sprintf(":%d", *midPortPtr),
 		Handler:      p,
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)),
 	}

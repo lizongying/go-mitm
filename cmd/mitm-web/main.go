@@ -10,41 +10,44 @@ import (
 )
 
 func main() {
-	filterPtr := flag.String("f", "", "-f filter")
-	replacePtr := flag.Bool("r", false, "-r replace")
-	proxyPtr := flag.String("p", "", "-p proxy")
+	midPortPtr := flag.Int("mid-port", 8082, "-mid-port proxyPort")
+	webPortPtr := flag.Int("web-port", 8083, "-web-port webPort")
+	includePtr := flag.String("include", "", "-include include")
+	excludePtr := flag.String("exclude", "localhost;127.0.0.1", "-exclude exclude")
+	proxyPtr := flag.String("proxy", "", "-proxy proxy")
 	flag.Parse()
 
 	var err error
 	messageChan := make(chan *api.Message, 255)
 
-	mux := api.NewApi(messageChan).Mux()
-	handler := api.CrossDomain(mux)
-	srvApi := &http.Server{
-		Addr:    ":8083",
-		Handler: handler,
+	p, err := mitm.NewProxy(*includePtr, *excludePtr, *proxyPtr)
+	if err != nil {
+		panic(err)
 	}
-	fmt.Println("Web: http://localhost:8083")
+	p.SetMessageChan(messageChan)
+	midSrv := &http.Server{
+		Addr:         fmt.Sprintf(":%d", *midPortPtr),
+		Handler:      p,
+		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)),
+	}
+	fmt.Printf("Mid: http://localhost:%d\n", *midPortPtr)
 	go func() {
-		err = srvApi.ListenAndServe()
+		err = midSrv.ListenAndServe()
 		if err != nil {
 			panic(err)
 		}
 	}()
 
-	p, err := mitm.NewProxy(*filterPtr, *proxyPtr, *replacePtr)
-	if err != nil {
-		panic(err)
+	handler := api.NewApi(messageChan, p.Include(), p.SetInclude, p.ClearInclude, p.Exclude(), p.SetExclude, p.ClearExclude).Handler()
+	handler = api.CrossDomain(handler)
+	handler = api.Print(handler)
+	srvApi := &http.Server{
+		Addr:    fmt.Sprintf(":%d", *webPortPtr),
+		Handler: handler,
 	}
-	p.SetMessageChan(messageChan)
-	srv := &http.Server{
-		Addr:         ":8082",
-		Handler:      p,
-		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)),
-	}
-	fmt.Println("Proxy: http://localhost:8082")
+	fmt.Printf("Web: http://localhost:%d\n", *webPortPtr)
 	go func() {
-		err = srv.ListenAndServe()
+		err = srvApi.ListenAndServe()
 		if err != nil {
 			panic(err)
 		}

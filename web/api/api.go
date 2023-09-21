@@ -15,9 +15,22 @@ type Api struct {
 	client      uint64
 	mux         *http.ServeMux
 	messageChan chan *Message
+
+	include        []string
+	fnSetInclude   func(include string) []string
+	fnClearInclude func() []string
+	exclude        []string
+	fnSetExclude   func(exclude string) []string
+	fnClearExclude func() []string
 }
 
-func NewApi(messageChan chan *Message) (a *Api) {
+func NewApi(messageChan chan *Message,
+	include []string,
+	fnSetInclude func(include string) []string,
+	fnClearInclude func() []string,
+	exclude []string,
+	fnSetExclude func(exclude string) []string,
+	fnClearExclude func() []string) (a *Api) {
 	a = new(Api)
 	a.mux = http.NewServeMux()
 	files, _ := fs.Sub(static.Dist, "dist")
@@ -27,23 +40,28 @@ func NewApi(messageChan chan *Message) (a *Api) {
 	a.mux.HandleFunc("/action", a.action)
 	a.record = true
 	a.messageChan = messageChan
+	a.include = include
+	a.fnSetInclude = fnSetInclude
+	a.fnClearInclude = fnClearInclude
+	a.exclude = exclude
+	a.fnSetExclude = fnSetExclude
+	a.fnClearExclude = fnClearExclude
 	return
 }
 
-func (a *Api) Mux() *http.ServeMux {
-	return a.mux
+func (a *Api) Handler() http.Handler {
+	return http.Handler(a.mux)
 }
-func (a *Api) info(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL.String())
-	if a.record {
-		_, _ = w.Write([]byte(`true`))
-	} else {
-		_, _ = w.Write([]byte(`false`))
+func (a *Api) info(w http.ResponseWriter, _ *http.Request) {
+	info := Info{
+		Record:  a.record,
+		Exclude: a.exclude,
+		Include: a.include,
 	}
+	_, _ = w.Write([]byte(info.String()))
 	return
 }
 func (a *Api) action(_ http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL.String())
 	record := r.URL.Query().Get("record")
 	if record != "" {
 		a.record = record == "true"
@@ -54,11 +72,27 @@ func (a *Api) action(_ http.ResponseWriter, r *http.Request) {
 		fmt.Println("replay", replay)
 		return
 	}
-
+	exclude := r.URL.Query().Get("exclude")
+	if exclude != "" {
+		if exclude == "-" {
+			a.exclude = a.fnClearExclude()
+			return
+		}
+		a.exclude = a.fnSetExclude(exclude)
+		return
+	}
+	include := r.URL.Query().Get("include")
+	if include != "" {
+		if include == "-" {
+			a.exclude = a.fnClearInclude()
+			return
+		}
+		a.include = a.fnSetInclude(include)
+		return
+	}
 	return
 }
-func (a *Api) event(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL.String())
+func (a *Api) event(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
@@ -93,6 +127,5 @@ out:
 	}
 
 	_, _ = fmt.Fprintf(w, "event: close\ndata: close\n\n")
-	fmt.Println("close")
 	return
 }

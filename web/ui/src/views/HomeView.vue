@@ -18,10 +18,22 @@
         <ClearOutlined @click="clear" class="hand"/>
       </a-tooltip>
       <a-tooltip>
+        <template #title>Include</template>
+        <PlusSquareOutlined @click="filter('Include')" class="hand"/>
+      </a-tooltip>
+      <a-tooltip>
+        <template #title>Exclude</template>
+        <MinusSquareOutlined @click="filter('Exclude')" class="hand"/>
+      </a-tooltip>
+      <a-tooltip>
         <template #title>Export</template>
         <ExportOutlined @click="out" class="hand"/>
       </a-tooltip>
     </a-space>
+    <a-modal v-model:open="openModal" :title="title" @ok="handleOk">
+      <a-textarea v-if="title === 'Include'" v-model:value="include" placeholder="" :rows="4"/>
+      <a-textarea v-if="title === 'Exclude'" v-model:value="exclude" placeholder="" :rows="4"/>
+    </a-modal>
     <a-table :columns="columns"
              :data-source="data"
              :pagination="{ hideOnSinglePage: true, pageSize: Infinity }"
@@ -246,8 +258,9 @@
                            type="java" line-numbers></PreviewCode>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="ApacheHttpClient">
-              <PreviewCode :code="toJavaApacheHttpClient(message.url, message.method, message.req_header, message.req_body)"
-                           type="java" line-numbers></PreviewCode>
+              <PreviewCode
+                  :code="toJavaApacheHttpClient(message.url, message.method, message.req_header, message.req_body)"
+                  type="java" line-numbers></PreviewCode>
             </a-collapse-panel>
             <a-collapse-panel key="3" header="OKhttp">
               <PreviewCode :code="toJavaOkHttp(message.url, message.method, message.req_header, message.req_body)"
@@ -283,10 +296,12 @@ import {
   ClearOutlined,
   ExportOutlined,
   FilterOutlined,
+  MinusSquareOutlined,
+  PlusSquareOutlined,
   PoweroffOutlined,
   ReloadOutlined,
   RightOutlined,
-  SearchOutlined
+  SearchOutlined,
 } from '@ant-design/icons-vue';
 import {onBeforeMount, reactive, ref} from 'vue'
 import {action, event, info} from '../request/api'
@@ -339,7 +354,7 @@ const open = ref(false);
 
 // detail
 const detail = record => {
-  console.log("record",  record)
+  console.log("record", record)
   message.value = record
   open.value = true;
 }
@@ -566,10 +581,51 @@ const out = () => {
   URL.revokeObjectURL(objectUrl)
 }
 
+const title = ref('')
+const include = ref('')
+const exclude = ref('')
+
+const openModal = ref(false);
+const filter = (t) => {
+  title.value = t
+  openModal.value = true;
+}
+const handleOk = () => {
+  if (title.value === 'Include') {
+    let inStr = include.value.split('\n').map(v => {
+      return v.trim()
+    }).filter(v => {
+      return v !== ''
+    }).join(';')
+    if (inStr === "") {
+      inStr = "-"
+    }
+    action({
+      include: inStr
+    }).finally(openModal.value = false)
+  }
+  if (title.value === 'Exclude') {
+    let exStr = exclude.value.split('\n').map(v => {
+      return v.trim()
+    }).filter(v => {
+      return v !== ''
+    }).join(';')
+    if (exStr === "") {
+      exStr = "-"
+    }
+    action({
+      exclude: exStr
+    }).finally(openModal.value = false)
+  }
+}
+
 onBeforeMount(() => {
   info().then(response => {
-    isRecord.value = response.data
-    console.log('isRecord', isRecord.value)
+    const info = response.data
+    console.log('info', info)
+    isRecord.value = info.record
+    include.value = info.include ? info.include.join('\n') : ''
+    exclude.value = info.exclude ? info.exclude.join('\n') : ''
   }).finally(_ => {
     if (isRecord.value) {
       getData()
