@@ -1,11 +1,12 @@
-package mitm
+package proxy
 
 import (
 	"net"
 )
 
 type Listener struct {
-	connChan chan net.Conn
+	connChan   chan net.Conn
+	remoteAddr string
 }
 
 func NewListener() (l *Listener, err error) {

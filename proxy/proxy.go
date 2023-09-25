@@ -1,4 +1,4 @@
-package mitm
+package proxy
 
 import (
 	"bytes"
@@ -28,6 +28,34 @@ import (
 	"sync/atomic"
 	"time"
 )
+
+var cipherSuiteMap = map[uint16]string{
+	0x0005: "TLS_RSA_WITH_RC4_128_SHA",
+	0x000a: "TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+	0x002f: "TLS_RSA_WITH_AES_128_CBC_SHA",
+	0x0035: "TLS_RSA_WITH_AES_256_CBC_SHA",
+	0x003c: "TLS_RSA_WITH_AES_128_CBC_SHA256",
+	0x009c: "TLS_RSA_WITH_AES_128_GCM_SHA256",
+	0x009d: "TLS_RSA_WITH_AES_256_GCM_SHA384",
+	0xc007: "TLS_ECDHE_ECDSA_WITH_RC4_128_SHA",
+	0xc009: "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+	0xc00a: "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+	0xc011: "TLS_ECDHE_RSA_WITH_RC4_128_SHA",
+	0xc012: "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA",
+	0xc013: "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+	0xc014: "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+	0xc023: "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256",
+	0xc027: "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256",
+	0xc02f: "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+	0xc02b: "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+	0xc030: "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+	0xc02c: "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+	0xcca8: "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+	0xcca9: "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+	0x1301: "TLS_AES_128_GCM_SHA256",
+	0x1302: "TLS_AES_256_GCM_SHA384",
+	0x1303: "TLS_CHACHA20_POLY1305_SHA256",
+}
 
 type Proxy struct {
 	rootCert     *x509.Certificate
@@ -227,14 +255,14 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 			respHeader[k] = response.Header.Get(k)
 		}
 
-		reqTrailer := make(map[string]string)
-		for k := range r.Trailer {
-			reqTrailer[k] = r.Trailer.Get(k)
-		}
-		respTrailer := make(map[string]string)
-		for k := range response.Trailer {
-			respTrailer[k] = response.Trailer.Get(k)
-		}
+		//reqTrailer := make(map[string]string)
+		//for k := range r.Trailer {
+		//	reqTrailer[k] = r.Trailer.Get(k)
+		//}
+		//respTrailer := make(map[string]string)
+		//for k := range response.Trailer {
+		//	respTrailer[k] = response.Trailer.Get(k)
+		//}
 
 		reqCookie := make(map[string]string)
 		for _, v := range r.Cookies() {
@@ -251,7 +279,7 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 			reqTls["NegotiatedProtocol"] = r.TLS.NegotiatedProtocol
 			reqTls["Version"] = fmt.Sprintf("%d", r.TLS.Version)
 			reqTls["Unique"] = string(r.TLS.TLSUnique)
-			reqTls["CipherSuite"] = fmt.Sprintf("%d", r.TLS.CipherSuite)
+			reqTls["CipherSuite"] = cipherSuiteMap[r.TLS.CipherSuite]
 		}
 
 		respTls := make(map[string]string)
@@ -271,7 +299,7 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 			}
 			respTls["Version"] = version
 			respTls["Unique"] = base64.StdEncoding.EncodeToString(response.TLS.TLSUnique)
-			respTls["CipherSuite"] = fmt.Sprintf("%d", response.TLS.CipherSuite)
+			respTls["CipherSuite"] = cipherSuiteMap[r.TLS.CipherSuite]
 		}
 
 		contentType := contentTypes
@@ -290,25 +318,24 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 		//p.logger.Info("Response", "StatusCode", response.StatusCode, r.Method, r.URL.String(), "contentType", contentType)
 
 		p.messageChan <- &api.Message{
-			Url:         r.URL.String(),
-			Method:      r.Method,
-			Type:        contentType,
-			Time:        spend,
-			Size:        uint16(size),
-			Status:      uint16(response.StatusCode),
-			ReqHeader:   reqHeader,
-			ReqTrailer:  reqTrailer,
-			ReqCookie:   reqCookie,
-			ReqBody:     string(reqBody),
-			RespHeader:  respHeader,
-			RespTrailer: respTrailer,
-			RespCookie:  respCookie,
-			RespBody:    respBody,
-			RespTls:     respTls,
+			Url:        r.URL.String(),
+			RemoteAddr: r.RemoteAddr,
+			Method:     r.Method,
+			Type:       contentType,
+			Time:       spend,
+			Size:       uint16(size),
+			Status:     uint16(response.StatusCode),
+			ReqHeader:  reqHeader,
+			ReqCookie:  reqCookie,
+			ReqBody:    string(reqBody),
+			RespHeader: respHeader,
+			RespCookie: respCookie,
+			RespBody:   respBody,
+			RespTls:    respTls,
 		}
 	}(r, response)
 }
-func (p *Proxy) handleHttps(w http.ResponseWriter, _ *http.Request) {
+func (p *Proxy) handleHttps(w http.ResponseWriter, r *http.Request) {
 	client, server := net.Pipe()
 	defer func() {
 		_ = client.Close()
@@ -482,12 +509,9 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	include := true
 	if len(p.include) > 0 {
 		include = false
-		fmt.Println(p.include)
 		for _, v := range p.include {
 			matched, _ := filepath.Match(v, host)
-			fmt.Println(matched, v, host)
 			if matched {
-				fmt.Println("include", host)
 				include = true
 				break
 			}

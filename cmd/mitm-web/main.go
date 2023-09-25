@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"github.com/lizongying/go-mitm/mitm"
+	"github.com/lizongying/go-mitm/proxy"
 	"github.com/lizongying/go-mitm/web/api"
 	"net/http"
 )
@@ -20,7 +20,7 @@ func main() {
 	var err error
 	messageChan := make(chan *api.Message, 255)
 
-	p, err := mitm.NewProxy(*includePtr, *excludePtr, *proxyPtr)
+	p, err := proxy.NewProxy(*includePtr, *excludePtr, *proxyPtr)
 	if err != nil {
 		panic(err)
 	}

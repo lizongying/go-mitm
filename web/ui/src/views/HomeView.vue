@@ -128,7 +128,7 @@
         <a-tab-pane key="1" tab="Overview">
           <a-collapse v-model:activeKey="activeKeyOverview" :bordered="false">
             <a-collapse-panel key="1" header="Overview">
-              <p></p>
+              <PreviewHeader :header="overview"></PreviewHeader>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="Request Header">
               <PreviewHeader :header="message.req_header"></PreviewHeader>
@@ -136,26 +136,17 @@
             <a-collapse-panel key="3" header="Request Cookie">
               <PreviewHeader :header="message.req_cookie"></PreviewHeader>
             </a-collapse-panel>
-            <a-collapse-panel key="4" header="Request Trailer">
-              <PreviewHeader :header="message.req_trailer"></PreviewHeader>
+            <a-collapse-panel key="4" header="Request Body">
+              <pre class="language-"><code class="language-">{{ message.req_body }}</code></pre>
             </a-collapse-panel>
-            <a-collapse-panel key="5" header="Request TLS">
-              <PreviewHeader :header="message.req_tls"></PreviewHeader>
-            </a-collapse-panel>
-            <a-collapse-panel key="6" header="Response Header">
+            <a-collapse-panel key="5" header="Response Header">
               <PreviewHeader :header="message.resp_header"></PreviewHeader>
             </a-collapse-panel>
-            <a-collapse-panel key="7" header="Response Cookie">
+            <a-collapse-panel key="6" header="Response Cookie">
               <PreviewHeader :header="message.resp_cookie"></PreviewHeader>
             </a-collapse-panel>
-            <a-collapse-panel key="8" header="Response Trailer">
-              <PreviewHeader :header="message.resp_trailer"></PreviewHeader>
-            </a-collapse-panel>
-            <a-collapse-panel key="9" header="Response TLS">
+            <a-collapse-panel key="7" header="Connection">
               <PreviewHeader :header="message.resp_tls"></PreviewHeader>
-            </a-collapse-panel>
-            <a-collapse-panel key="10" header="Connection">
-              <p></p>
             </a-collapse-panel>
           </a-collapse>
         </a-tab-pane>
@@ -303,7 +294,7 @@ import {
   RightOutlined,
   SearchOutlined,
 } from '@ant-design/icons-vue';
-import {onBeforeMount, reactive, ref} from 'vue'
+import {computed, onBeforeMount, reactive, ref} from 'vue'
 import {action, event, info} from '../request/api'
 import {formatHexDump} from '../utils'
 import PreviewCode from '../components/PreviewCode.vue'
@@ -359,11 +350,15 @@ const detail = record => {
   open.value = true;
 }
 
+const overview = computed(() => {
+  console.log(message.value)
+  return {"remote addr": message.value.remote_addr}
+})
+
 const state = reactive({
   searchText: '',
   searchedColumn: '',
 });
-
 
 const searchInput = ref();
 const handleSearch = (selectedKeys, confirm, dataIndex) => {

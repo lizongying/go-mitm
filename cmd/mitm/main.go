@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"github.com/lizongying/go-mitm/mitm"
+	"github.com/lizongying/go-mitm/proxy"
 	"net/http"
 )
 
@@ -15,7 +15,7 @@ func main() {
 	proxyPtr := flag.String("proxy", "", "-proxy proxy")
 	flag.Parse()
 
-	p, err := mitm.NewProxy(*includePtr, *excludePtr, *proxyPtr)
+	p, err := proxy.NewProxy(*includePtr, *excludePtr, *proxyPtr)
 	if err != nil {
 		return
 	}
