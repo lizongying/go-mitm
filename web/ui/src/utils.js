@@ -1,4 +1,7 @@
 function formatHexDump(inputString) {
+    if (inputString === undefined || inputString === null || inputString === '') {
+        return ''
+    }
 // 创建一个 TextEncoder 对象
     const textEncoder = new TextEncoder();
 

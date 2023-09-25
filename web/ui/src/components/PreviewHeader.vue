@@ -1,25 +1,23 @@
 <template>
-    <pre class="language-java"><code class="language-java"><span v-for="{k, v} in headers" key="k">{{ k }}: {{
-        v
-        }}
-</span></code></pre>
+  <pre class="language-java"><code class="language-java">{{ headers }}</code></pre>
 </template>
 <script setup>
 import {computed, onMounted} from 'vue'
 import Prism from "prismjs";
 
 const props = defineProps({
-    header: {},
+  header: {},
 })
+
 const headers = computed(() => {
-    let arr = []
-    if (props.header === undefined) {
-        return arr
-    }
-    Object.entries(props.header).forEach((v) => {
-        arr.push({k: v[0], v: v[1]})
-    })
-    return arr
+  let arr = []
+  if (props.header === undefined || props.header === null) {
+    return ''
+  }
+  Object.entries(props.header).forEach((v) => {
+    arr.push(v[0] + ": " + v[1])
+  })
+  return arr.join("\n")
 })
 onMounted(() => {
   Prism.highlightAll()

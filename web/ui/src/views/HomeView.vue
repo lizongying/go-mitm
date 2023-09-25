@@ -128,7 +128,7 @@
         <a-tab-pane key="1" tab="Overview">
           <a-collapse v-model:activeKey="activeKeyOverview" :bordered="false">
             <a-collapse-panel key="1" header="Overview">
-              <PreviewHeader :header="overview"></PreviewHeader>
+              <PreviewHeader :header="{'remote addr': message.remote_addr ?? ''}"></PreviewHeader>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="Request Header">
               <PreviewHeader :header="message.req_header"></PreviewHeader>
@@ -137,7 +137,7 @@
               <PreviewHeader :header="message.req_cookie"></PreviewHeader>
             </a-collapse-panel>
             <a-collapse-panel key="4" header="Request Body">
-              <pre class="language-"><code class="language-">{{ message.req_body }}</code></pre>
+              <pre class="language-"><code class="language-">{{ message.req_body ?? '' }}</code></pre>
             </a-collapse-panel>
             <a-collapse-panel key="5" header="Response Header">
               <PreviewHeader :header="message.resp_header"></PreviewHeader>
@@ -150,7 +150,7 @@
             </a-collapse-panel>
           </a-collapse>
         </a-tab-pane>
-        <a-tab-pane key="3" tab="Preview">
+        <a-tab-pane key="2" tab="Preview">
           <a-collapse v-model:activeKey="activeKeyPreview" :bordered="false">
             <a-collapse-panel key="1" header="raw">
               <pre class="language-"><code class="language-">{{ message.resp_body }}</code></pre>
@@ -166,7 +166,7 @@
             </a-collapse-panel>
           </a-collapse>
         </a-tab-pane>
-        <a-tab-pane key="4" tab="cURL">
+        <a-tab-pane key="3" tab="cURL">
           <a-collapse v-model:activeKey="activeKeyCurl" :bordered="false">
             <a-collapse-panel key="1" header="curl">
               <PreviewCode
@@ -175,7 +175,7 @@
             </a-collapse-panel>
           </a-collapse>
         </a-tab-pane>
-        <a-tab-pane key="5" tab="javascript">
+        <a-tab-pane key="4" tab="javascript">
           <a-collapse v-model:activeKey="activeKeyJs" :bordered="false">
             <a-collapse-panel key="1" header="fetch">
               <PreviewCode
@@ -199,7 +199,7 @@
             </a-collapse-panel>
           </a-collapse>
         </a-tab-pane>
-        <a-tab-pane key="6" tab="python">
+        <a-tab-pane key="5" tab="python">
           <a-collapse v-model:activeKey="activeKeyPy" :bordered="false">
             <a-collapse-panel key="1" header="request">
               <PreviewCode
@@ -228,7 +228,7 @@
             </a-collapse-panel>
           </a-collapse>
         </a-tab-pane>
-        <a-tab-pane key="7" tab="golang">
+        <a-tab-pane key="6" tab="golang">
           <a-collapse v-model:activeKey="activeKeyGo" :bordered="false">
             <a-collapse-panel key="1" header="http.Client">
               <PreviewCode
@@ -242,7 +242,7 @@
             </a-collapse-panel>
           </a-collapse>
         </a-tab-pane>
-        <a-tab-pane key="8" tab="java">
+        <a-tab-pane key="7" tab="java">
           <a-collapse v-model:activeKey="activeKeyJava" :bordered="false">
             <a-collapse-panel key="1" header="HttpClient">
               <PreviewCode :code="toJavaHttpClient(message.url, message.method, message.req_header, message.req_body)"
@@ -263,7 +263,7 @@
             </a-collapse-panel>
           </a-collapse>
         </a-tab-pane>
-        <a-tab-pane key="9" tab="php">
+        <a-tab-pane key="8" tab="php">
           <a-collapse v-model:activeKey="activeKeyPhp" :bordered="false">
             <a-collapse-panel key="1" header="cURL">
               <PreviewCode
@@ -294,7 +294,7 @@ import {
   RightOutlined,
   SearchOutlined,
 } from '@ant-design/icons-vue';
-import {computed, onBeforeMount, reactive, ref} from 'vue'
+import {onBeforeMount, reactive, ref} from 'vue'
 import {action, event, info} from '../request/api'
 import {formatHexDump} from '../utils'
 import PreviewCode from '../components/PreviewCode.vue'
@@ -349,11 +349,11 @@ const detail = record => {
   message.value = record
   open.value = true;
 }
-
-const overview = computed(() => {
-  console.log(message.value)
-  return {"remote addr": message.value.remote_addr}
-})
+//
+// const overview = computed(() => {
+//   console.log(message.value)
+//   return {"remote addr": message.remote_addr}
+// })
 
 const state = reactive({
   searchText: '',
