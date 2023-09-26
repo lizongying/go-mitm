@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/lizongying/go-mitm/static"
 	"io/fs"
@@ -25,6 +26,7 @@ type Api struct {
 	proxy          string
 	fnSetProxy     func(proxy string) string
 	fnClearProxy   func() string
+	fnReplay       func(message Message)
 }
 
 func NewApi(messageChan chan *Message,
@@ -37,6 +39,7 @@ func NewApi(messageChan chan *Message,
 	proxy string,
 	fnSetProxy func(proxy string) string,
 	fnClearProxy func() string,
+	fnReplay func(message Message),
 ) (a *Api) {
 	a = new(Api)
 	a.mux = http.NewServeMux()
@@ -56,6 +59,7 @@ func NewApi(messageChan chan *Message,
 	a.proxy = proxy
 	a.fnSetProxy = fnSetProxy
 	a.fnClearProxy = fnClearProxy
+	a.fnReplay = fnReplay
 	return
 }
 
@@ -80,7 +84,9 @@ func (a *Api) action(_ http.ResponseWriter, r *http.Request) {
 	}
 	replay := r.URL.Query().Get("replay")
 	if replay != "" {
-		fmt.Println("replay", replay)
+		var message Message
+		_ = json.Unmarshal([]byte(replay), &message)
+		a.fnReplay(message)
 		return
 	}
 	exclude := r.URL.Query().Get("exclude")

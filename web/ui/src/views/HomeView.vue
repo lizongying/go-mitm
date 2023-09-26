@@ -66,7 +66,12 @@
           <a-space wrap>
             <a-tooltip>
               <template #title>Replay</template>
-              <ReloadOutlined @click="replay(record.id)" class="hand"/>
+              <ReloadOutlined @click="replay({
+    method: record.method,
+    url: record.url,
+    req_header: record.req_header,
+    req_body: record.req_body,
+  })" class="hand"/>
             </a-tooltip>
             <a-tooltip>
               <template #title>More</template>
@@ -339,9 +344,8 @@ const record = () => {
 }
 
 // replay
-const replay = id => {
-  console.log('id', id)
-  action({replay: id})
+const replay = record => {
+  action({replay: JSON.stringify(record)})
 }
 
 // message
@@ -532,7 +536,7 @@ const getData = () => {
   es.onerror = event => {
     // console.log('es error', event)
     if (event.readyState === EventSource.CLOSED) {
-      console.log('event was closed')
+      // console.log('event was closed')
     }
   };
   es.addEventListener('close', _ => {
@@ -543,7 +547,7 @@ const getData = () => {
 }
 
 const activeKey = ref('1');
-const activeKeyOverview = ref([])
+const activeKeyOverview = ref([2])
 const activeKeyPreview = ref([1])
 const activeKeyCurl = ref([1])
 const activeKeyJs = ref([4])

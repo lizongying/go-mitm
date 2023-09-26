@@ -178,7 +178,7 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 	var size int64
 	var respBody string
 	contentTypes := response.Header.Get("Content-Type")
-	if strings.Contains(strings.ToLower(contentTypes), "image") {
+	if strings.Contains(strings.ToLower(contentTypes), "image") || strings.Contains(strings.ToLower(contentTypes), "video") {
 		size, _ = io.Copy(w, response.Body)
 	} else {
 		bodyBytes, err := io.ReadAll(response.Body)
@@ -301,7 +301,11 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 			}
 			respTls["Version"] = version
 			respTls["Unique"] = base64.StdEncoding.EncodeToString(response.TLS.TLSUnique)
-			respTls["CipherSuite"] = cipherSuiteMap[r.TLS.CipherSuite]
+			if r.TLS != nil {
+				if cipherSuite, ok := cipherSuiteMap[r.TLS.CipherSuite]; ok {
+					respTls["CipherSuite"] = cipherSuite
+				}
+			}
 		}
 
 		contentType := contentTypes
@@ -509,6 +513,199 @@ func (p *Proxy) SetProxy(proxy string) string {
 func (p *Proxy) ClearProxy() string {
 	p.proxy = nil
 	return ""
+}
+func (p *Proxy) Replay(message api.Message) {
+	r, err := http.NewRequest(message.Method, message.Url, strings.NewReader(message.ReqBody))
+	if err != nil {
+		return
+	}
+	for k, v := range message.ReqHeader {
+		r.Header.Set(k, v)
+	}
+
+	reqBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
+	r.Body = io.NopCloser(bytes.NewBuffer(reqBody))
+
+	t := http.DefaultTransport.(*http.Transport)
+	if p.proxy != nil {
+		t.Proxy = func(_ *http.Request) (*url.URL, error) {
+			return p.proxy, nil
+		}
+	}
+	begin := time.Now()
+	response, err := t.RoundTrip(r)
+	spend := uint16(time.Now().Sub(begin).Milliseconds())
+	if err != nil {
+		return
+	}
+
+	defer func() {
+		_ = response.Body.Close()
+	}()
+
+	var size int64
+	var respBody string
+	contentTypes := response.Header.Get("Content-Type")
+	bodyBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		return
+	}
+
+	size = int64(len(bodyBytes))
+	if !(strings.Contains(strings.ToLower(contentTypes), "image") || strings.Contains(strings.ToLower(contentTypes), "video")) {
+		if response.Header.Get("Content-Encoding") == "deflate" {
+			reader := flate.NewReader(bytes.NewReader(bodyBytes))
+			defer func() {
+				err = reader.Close()
+				if err != nil {
+					return
+				}
+			}()
+
+			bodyBytes, err = io.ReadAll(reader)
+			if err != nil {
+				return
+			}
+		}
+		if response.Header.Get("Content-Encoding") == "br" {
+			bodyBytes, err = io.ReadAll(brotli.NewReader(bytes.NewReader(bodyBytes)))
+			if err != nil {
+				return
+			}
+		}
+		if response.Header.Get("Content-Encoding") == "deflate" {
+			reader := flate.NewReader(bytes.NewReader(bodyBytes))
+			defer func() {
+				if reader != nil {
+					err = reader.Close()
+					if err != nil {
+						return
+					}
+				}
+			}()
+			bodyBytes, err = io.ReadAll(reader)
+			if err != nil {
+				return
+			}
+		}
+		if response.Header.Get("Content-Encoding") == "gzip" {
+			reader, err := gzip.NewReader(bytes.NewReader(bodyBytes))
+			defer func() {
+				if reader != nil {
+					err = reader.Close()
+					if err != nil {
+						return
+					}
+				}
+			}()
+			if err != nil {
+				return
+			}
+			bodyBytes, err = io.ReadAll(reader)
+			if err != nil {
+				return
+			}
+		}
+
+		respBody = string(bodyBytes)
+	}
+
+	go func(r *http.Request, response *http.Response) {
+		reqHeader := make(map[string]string)
+		for k := range r.Header {
+			reqHeader[k] = r.Header.Get(k)
+		}
+		respHeader := make(map[string]string)
+		for k := range response.Header {
+			respHeader[k] = response.Header.Get(k)
+		}
+
+		//reqTrailer := make(map[string]string)
+		//for k := range r.Trailer {
+		//	reqTrailer[k] = r.Trailer.Get(k)
+		//}
+		//respTrailer := make(map[string]string)
+		//for k := range response.Trailer {
+		//	respTrailer[k] = response.Trailer.Get(k)
+		//}
+
+		reqCookie := make(map[string]string)
+		for _, v := range r.Cookies() {
+			reqCookie[v.Name] = v.Raw
+		}
+		respCookie := make(map[string]string)
+		for _, v := range response.Cookies() {
+			respCookie[v.Name] = v.Raw
+		}
+
+		reqTls := make(map[string]string)
+		if r.TLS != nil {
+			reqTls["ServerName"] = r.TLS.ServerName
+			reqTls["NegotiatedProtocol"] = r.TLS.NegotiatedProtocol
+			reqTls["Version"] = fmt.Sprintf("%d", r.TLS.Version)
+			reqTls["Unique"] = string(r.TLS.TLSUnique)
+			reqTls["CipherSuite"] = cipherSuiteMap[r.TLS.CipherSuite]
+		}
+
+		respTls := make(map[string]string)
+		if response.TLS != nil {
+			respTls["ServerName"] = response.TLS.ServerName
+			respTls["NegotiatedProtocol"] = response.TLS.NegotiatedProtocol
+			version := "Unknown"
+			switch response.TLS.Version {
+			case tls.VersionTLS10:
+				version = "1.0"
+			case tls.VersionTLS11:
+				version = "1.1"
+			case tls.VersionTLS12:
+				version = "1.2"
+			case tls.VersionTLS13:
+				version = "1.3"
+			}
+			respTls["Version"] = version
+			respTls["Unique"] = base64.StdEncoding.EncodeToString(response.TLS.TLSUnique)
+			if r.TLS != nil {
+				if cipherSuite, ok := cipherSuiteMap[r.TLS.CipherSuite]; ok {
+					respTls["CipherSuite"] = cipherSuite
+				}
+			}
+		}
+
+		contentType := contentTypes
+		for _, v := range strings.Split(contentTypes, ";") {
+			v = strings.TrimSpace(v)
+			if v == "" {
+				continue
+			}
+			if strings.Contains(strings.ToLower(v), "charset=") {
+				continue
+			}
+			contentType = v
+			break
+		}
+
+		//p.logger.Info("Response", "StatusCode", response.StatusCode, r.Method, r.URL.String(), "contentType", contentType)
+
+		p.messageChan <- &api.Message{
+			Url:        r.URL.String(),
+			RemoteAddr: r.RemoteAddr,
+			Method:     r.Method,
+			Type:       contentType,
+			Time:       spend,
+			Size:       uint16(size),
+			Status:     uint16(response.StatusCode),
+			ReqHeader:  reqHeader,
+			ReqCookie:  reqCookie,
+			ReqBody:    string(reqBody),
+			RespHeader: respHeader,
+			RespCookie: respCookie,
+			RespBody:   respBody,
+			RespTls:    respTls,
+		}
+	}(r, response)
 }
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	host := r.Host

@@ -3,9 +3,5 @@ import {RouterView} from 'vue-router'
 </script>
 
 <template>
-    <RouterView class="view right-sidebar"/>
+  <RouterView/>
 </template>
-
-<style scoped>
-
-</style>
