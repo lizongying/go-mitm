@@ -22,6 +22,9 @@ type Api struct {
 	exclude        []string
 	fnSetExclude   func(exclude string) []string
 	fnClearExclude func() []string
+	proxy          string
+	fnSetProxy     func(proxy string) string
+	fnClearProxy   func() string
 }
 
 func NewApi(messageChan chan *Message,
@@ -30,7 +33,11 @@ func NewApi(messageChan chan *Message,
 	fnClearInclude func() []string,
 	exclude []string,
 	fnSetExclude func(exclude string) []string,
-	fnClearExclude func() []string) (a *Api) {
+	fnClearExclude func() []string,
+	proxy string,
+	fnSetProxy func(proxy string) string,
+	fnClearProxy func() string,
+) (a *Api) {
 	a = new(Api)
 	a.mux = http.NewServeMux()
 	files, _ := fs.Sub(static.Dist, "dist")
@@ -46,6 +53,9 @@ func NewApi(messageChan chan *Message,
 	a.exclude = exclude
 	a.fnSetExclude = fnSetExclude
 	a.fnClearExclude = fnClearExclude
+	a.proxy = proxy
+	a.fnSetProxy = fnSetProxy
+	a.fnClearProxy = fnClearProxy
 	return
 }
 
@@ -55,6 +65,7 @@ func (a *Api) Handler() http.Handler {
 func (a *Api) info(w http.ResponseWriter, _ *http.Request) {
 	info := Info{
 		Record:  a.record,
+		Proxy:   a.proxy,
 		Exclude: a.exclude,
 		Include: a.include,
 	}
@@ -88,6 +99,15 @@ func (a *Api) action(_ http.ResponseWriter, r *http.Request) {
 			return
 		}
 		a.include = a.fnSetInclude(include)
+		return
+	}
+	proxy := r.URL.Query().Get("proxy")
+	if proxy != "" {
+		if proxy == "-" {
+			a.proxy = a.fnClearProxy()
+			return
+		}
+		a.proxy = a.fnSetProxy(proxy)
 		return
 	}
 	return

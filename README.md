@@ -6,14 +6,25 @@
 
 ## Contents
 
-1. [Usage](#Usage)
+1. [Feature](#Feature)
+2. [Usage](#Usage)
     1. [Install certificate](#Install-certificate)
     2. [Set the proxy](#Set-the-proxy)
     3. [Run](#Run)
     4. [Open the link](#Open-the-link)
     5. [Include & Exclude](#Include--Exclude)
-2. [Dev](#Dev)
-3. [TODO](#TODO)
+3. [Dev](#Dev)
+4. [TODO](#TODO)
+
+## Feature
+
+* 支持启动/关闭中间人代理
+* 支持设置包含/排除名单
+* 支持设置上游地址
+* 支持导出
+* 支持清除/筛选/排序
+* 支持请求转为各语言代码
+* 支持响应以raw/html/json/hex等方式显示
 
 ## Usage
 
@@ -101,6 +112,10 @@ windows:
 
 ![image](./screenshot/img_11.png)
 
+### tips
+
+* 如果设置了代理，直连的时候依然使用代理。如果不需要代理，请清空代理。
+
 ## Dev
 
 ### Test
@@ -128,3 +143,4 @@ make
 * java
 * middleware tmpdir save image/video
 * replay
+* https proxy

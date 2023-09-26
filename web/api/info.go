@@ -4,6 +4,7 @@ import "encoding/json"
 
 type Info struct {
 	Record  bool     `json:"record,omitempty"`
+	Proxy   string   `json:"proxy,omitempty"`
 	Exclude []string `json:"exclude,omitempty"`
 	Include []string `json:"include,omitempty"`
 }

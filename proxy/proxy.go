@@ -116,10 +116,6 @@ func (p *Proxy) doReplace(w http.ResponseWriter, r *http.Request) {
 `, r.Host, r.URL.String())))
 }
 func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
-	if p.proxy != nil {
-		r.Header.Set("Proxy-Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(p.proxy.String())))
-	}
-
 	if r.URL.Host == "" {
 		r.URL.Host = r.Host
 	}
@@ -149,8 +145,14 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 	//}
 	//reqBody, err := io.ReadAll(getBody)
 
+	t := http.DefaultTransport.(*http.Transport)
+	if p.proxy != nil {
+		t.Proxy = func(_ *http.Request) (*url.URL, error) {
+			return p.proxy, nil
+		}
+	}
 	begin := time.Now()
-	response, err := http.DefaultTransport.RoundTrip(r)
+	response, err := t.RoundTrip(r)
 	spend := uint16(time.Now().Sub(begin).Milliseconds())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusServiceUnavailable)
@@ -335,7 +337,7 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 		}
 	}(r, response)
 }
-func (p *Proxy) handleHttps(w http.ResponseWriter, r *http.Request) {
+func (p *Proxy) handleHttps(w http.ResponseWriter, _ *http.Request) {
 	client, server := net.Pipe()
 	defer func() {
 		_ = client.Close()
@@ -386,9 +388,6 @@ func (p *Proxy) close() (err error) {
 }
 func (p *Proxy) forward(w http.ResponseWriter, r *http.Request) {
 	r.Header.Del("Proxy-Connection")
-	if p.proxy != nil {
-		r.Header.Set("Proxy-Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(p.proxy.String())))
-	}
 
 	if r.Method == "CONNECT" {
 		ctx := context.Background()
@@ -436,7 +435,11 @@ func (p *Proxy) forward(w http.ResponseWriter, r *http.Request) {
 		}()
 		g.Wait()
 	} else {
-		response, err := http.DefaultTransport.RoundTrip(r)
+		t := http.DefaultTransport.(*http.Transport)
+		t.Proxy = func(_ *http.Request) (*url.URL, error) {
+			return p.proxy, nil
+		}
+		response, err := t.RoundTrip(r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusServiceUnavailable)
 			return
@@ -489,6 +492,23 @@ func (p *Proxy) SetExclude(excludes string) []string {
 func (p *Proxy) ClearExclude() []string {
 	p.exclude = make([]string, 0)
 	return p.exclude
+}
+func (p *Proxy) Proxy() string {
+	if p.proxy == nil {
+		return ""
+	}
+	return p.proxy.String()
+}
+func (p *Proxy) SetProxy(proxy string) string {
+	p.proxy, _ = url.Parse(proxy)
+	if p.proxy == nil {
+		return ""
+	}
+	return p.proxy.String()
+}
+func (p *Proxy) ClearProxy() string {
+	p.proxy = nil
+	return ""
 }
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	host := r.Host

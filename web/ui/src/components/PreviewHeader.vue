@@ -2,7 +2,7 @@
   <pre class="language-java"><code class="language-java">{{ headers }}</code></pre>
 </template>
 <script setup>
-import {computed, onMounted} from 'vue'
+import {computed, onMounted, onUpdated} from 'vue'
 import Prism from "prismjs";
 
 const props = defineProps({
@@ -22,4 +22,8 @@ const headers = computed(() => {
 onMounted(() => {
   Prism.highlightAll()
 });
+onUpdated(() => {
+      Prism.highlightAll()
+    }
+)
 </script>

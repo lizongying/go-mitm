@@ -38,7 +38,7 @@ func main() {
 		}
 	}()
 
-	handler := api.NewApi(messageChan, p.Include(), p.SetInclude, p.ClearInclude, p.Exclude(), p.SetExclude, p.ClearExclude).Handler()
+	handler := api.NewApi(messageChan, p.Include(), p.SetInclude, p.ClearInclude, p.Exclude(), p.SetExclude, p.ClearExclude, p.Proxy(), p.SetProxy, p.ClearProxy).Handler()
 	handler = api.CrossDomain(handler)
 	handler = api.Print(handler)
 	srvApi := &http.Server{

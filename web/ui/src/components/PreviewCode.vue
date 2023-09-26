@@ -3,7 +3,7 @@
                                                    v-html="html"></code></pre>
 </template>
 <script setup>
-import {computed, onMounted} from 'vue'
+import {computed, onMounted, onUpdated} from 'vue'
 import Prism from 'prismjs'
 
 const props = defineProps({
@@ -29,4 +29,8 @@ const html = computed(() => {
 onMounted(() => {
   Prism.highlightAll()
 });
+onUpdated(() => {
+      Prism.highlightAll()
+    }
+)
 </script>

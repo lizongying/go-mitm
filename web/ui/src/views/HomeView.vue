@@ -26,6 +26,10 @@
         <MinusSquareOutlined @click="filter('Exclude')" class="hand"/>
       </a-tooltip>
       <a-tooltip>
+        <template #title>Proxy</template>
+        <GatewayOutlined @click="filter('Proxy')" class="hand"/>
+      </a-tooltip>
+      <a-tooltip>
         <template #title>Export</template>
         <ExportOutlined @click="out" class="hand"/>
       </a-tooltip>
@@ -33,6 +37,7 @@
     <a-modal v-model:open="openModal" :title="title" @ok="handleOk">
       <a-textarea v-if="title === 'Include'" v-model:value="include" placeholder="" :rows="4"/>
       <a-textarea v-if="title === 'Exclude'" v-model:value="exclude" placeholder="" :rows="4"/>
+      <a-input v-if="title === 'Proxy'" v-model:value="proxy" placeholder=""/>
     </a-modal>
     <a-table :columns="columns"
              :data-source="data"
@@ -287,12 +292,13 @@ import {
   ClearOutlined,
   ExportOutlined,
   FilterOutlined,
+  GatewayOutlined,
   MinusSquareOutlined,
   PlusSquareOutlined,
   PoweroffOutlined,
   ReloadOutlined,
   RightOutlined,
-  SearchOutlined,
+  SearchOutlined
 } from '@ant-design/icons-vue';
 import {onBeforeMount, reactive, ref} from 'vue'
 import {action, event, info} from '../request/api'
@@ -345,15 +351,9 @@ const open = ref(false);
 
 // detail
 const detail = record => {
-  console.log("record", record)
   message.value = record
   open.value = true;
 }
-//
-// const overview = computed(() => {
-//   console.log(message.value)
-//   return {"remote addr": message.remote_addr}
-// })
 
 const state = reactive({
   searchText: '',
@@ -520,7 +520,7 @@ const maxRow = 15
 const getData = () => {
   const es = event()
   es.onopen = _ => {
-    console.log('es open');
+    // console.log('es open');
   };
   es.onmessage = event => {
     console.log(event.data);
@@ -530,13 +530,13 @@ const getData = () => {
     }
   };
   es.onerror = event => {
-    console.log('es error', event)
+    // console.log('es error', event)
     if (event.readyState === EventSource.CLOSED) {
       console.log('event was closed')
     }
   };
   es.addEventListener('close', _ => {
-    console.log('es close')
+    // console.log('es close')
     es.close()
     isRecord.value = false
   })
@@ -579,6 +579,7 @@ const out = () => {
 const title = ref('')
 const include = ref('')
 const exclude = ref('')
+const proxy = ref('')
 
 const openModal = ref(false);
 const filter = (t) => {
@@ -612,6 +613,15 @@ const handleOk = () => {
       exclude: exStr
     }).finally(openModal.value = false)
   }
+  if (title.value === 'Proxy') {
+    let proxyStr = proxy.value.trim()
+    if (proxyStr === "") {
+      proxyStr = "-"
+    }
+    action({
+      proxy: proxyStr
+    }).finally(openModal.value = false)
+  }
 }
 
 onBeforeMount(() => {
@@ -621,6 +631,7 @@ onBeforeMount(() => {
     isRecord.value = info.record
     include.value = info.include ? info.include.join('\n') : ''
     exclude.value = info.exclude ? info.exclude.join('\n') : ''
+    proxy.value = info.proxy ? info.proxy : ''
   }).finally(_ => {
     if (isRecord.value) {
       getData()

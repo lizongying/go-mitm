@@ -5,8 +5,7 @@ import (
 )
 
 type Listener struct {
-	connChan   chan net.Conn
-	remoteAddr string
+	connChan chan net.Conn
 }
 
 func NewListener() (l *Listener, err error) {
