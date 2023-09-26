@@ -25,12 +25,13 @@
 * 支持清除/筛选/排序
 * 支持请求转为各语言代码
 * 支持响应以raw/html/json/hex等方式显示
+* 支持请求重放
 
 ## Usage
 
 ### Install certificate
 
-当前设备安装并信任CA证书 [ca.crt](https://github.com/lizongying/go-mitm/releases/download/v0.0.5/ca.crt)
+当前设备安装并信任CA证书 [ca.crt](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/ca.crt)
 
 mac:
 
@@ -84,17 +85,17 @@ mitm
 
 mac:
 
-[mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.5/mitm_darwin_arm64)
-[mitm_darwin_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.5/mitm_darwin_amd64)
+[mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_darwin_arm64)
+[mitm_darwin_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_darwin_amd64)
 
 linux:
 
-[mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.5/mitm_linux_arm64)
-[mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.5/mitm_linux_amd64)
+[mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_linux_arm64)
+[mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_linux_amd64)
 
 windows:
 
-[mitm_windows_amd64.exe](https://github.com/lizongying/go-mitm/releases/download/v0.0.5/mitm_windows_amd64.exe)
+[mitm_windows_amd64.exe](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_windows_amd64.exe)
 
 ### Open the link
 
