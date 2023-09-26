@@ -20,7 +20,7 @@
 
 * 支持启动/关闭中间人代理
 * 支持设置包含/排除名单
-* 支持设置上游地址
+* 支持设置上游代理
 * 支持导出
 * 支持清除/筛选/排序
 * 支持请求转为各语言代码
@@ -86,11 +86,13 @@ mitm
 mac:
 
 [mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_darwin_arm64)
+
 [mitm_darwin_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_darwin_amd64)
 
 linux:
 
 [mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_linux_arm64)
+
 [mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_linux_amd64)
 
 windows:
@@ -143,5 +145,4 @@ make
 * node https/request
 * java
 * middleware tmpdir save image/video
-* replay
 * https proxy

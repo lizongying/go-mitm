@@ -110,7 +110,7 @@
             </template>
             Search
           </a-button>
-          <a-button size="small" style="width: 90px" @click="handleReset(clearFilters)">
+          <a-button size="small" style="width: 90px" @click="handleReset(clearFilters, confirm)">
             Reset
           </a-button>
         </div>
@@ -371,7 +371,8 @@ const handleSearch = (selectedKeys, confirm, dataIndex) => {
   state.searchedColumn = dataIndex;
 };
 
-const handleReset = clearFilters => {
+const handleReset = (clearFilters, confirm) => {
+  confirm();
   clearFilters({confirm: true});
   state.searchText = '';
 };
@@ -420,6 +421,10 @@ const columns = [
       {
         text: 'image',
         value: 'image',
+      },
+      {
+        text: 'video',
+        value: 'video',
       },
     ],
     onFilter: (value, record) => {
