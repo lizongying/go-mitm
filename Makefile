@@ -7,6 +7,7 @@ shell:
 
 ui:
 	npm run build --prefix ./web/ui
+	rm -rf ./static/dist
 	cp -R ./web/ui/dist ./static
 
 tidy:
