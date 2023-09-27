@@ -8,11 +8,12 @@
 
 1. [Feature](#Feature)
 2. [Usage](#Usage)
-    1. [Install certificate](#Install-certificate)
-    2. [Set the proxy](#Set-the-proxy)
-    3. [Run](#Run)
-    4. [Open the link](#Open-the-link)
+    1. [Run](#Run)
+    2. [Open the link](#Open-the-link)
+    3. [Install certificate](#Install-certificate)
+    4. [Set the proxy](#Set-the-proxy)
     5. [Include & Exclude](#Include--Exclude)
+    6. [Tips](#Tips)
 3. [Dev](#Dev)
 4. [TODO](#TODO)
 
@@ -29,9 +30,42 @@
 
 ## Usage
 
+### Run
+
+下载相应平台的可执行文件并执行 [releases](https://github.com/lizongying/go-mitm/releases/)
+
+参数:
+
+* -mid-port 指定中间人端口
+* -web-port 指定网页端口
+* -include 指定包含规则，多条规则用";"分割（使用中间人，页面能看到记录）
+* -exclude 指定排除规则，多条规则用";"分割（使用直连，页面看不到记录）
+* -proxy proxy 指定上游代理
+
+过滤规则仅对hostname过滤。如
+
+* a.com
+* a.com.cn
+* a.*.cn
+* *.com
+* a.*
+* a.com.*
+* \*.*
+
+### Open the link
+
+访问链接，如 http://localhost:8083
+
+![image](./screenshot/img.png)
+![image](./screenshot/img_1.png)
+![image](./screenshot/img_4.png)
+![image](./screenshot/img_2.png)
+![image](./screenshot/img_3.png)
+
 ### Install certificate
 
-当前设备安装并信任CA证书 [ca.crt](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/ca.crt)
+当前设备下载安装并信任CA证书
+![image](./screenshot/img_14.png)
 
 mac:
 
@@ -57,67 +91,15 @@ windows:
 ![image](./screenshot/img_12.png)
 ![image](./screenshot/img_13.png)
 
-### Run
-
-执行程序
-
-```shell
-mitm
-```
-
-参数:
-
-* -mid-port 指定中间人端口
-* -web-port 指定网页端口
-* -include 指定包含规则，多条规则用";"分割（使用中间人，页面能看到记录）
-* -exclude 指定排除规则，多条规则用";"分割（使用直连，页面看不到记录）
-* -proxy proxy 指定上游代理
-
-过滤规则仅对hostname过滤。如
-
-* a.com
-* a.com.cn
-* a.*.cn
-* *.com
-* a.*
-* a.com.*
-* \*.*
-
-mac:
-
-[mitm_darwin_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_darwin_arm64)
-
-[mitm_darwin_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_darwin_amd64)
-
-linux:
-
-[mitm_linux_arm64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_linux_arm64)
-
-[mitm_linux_amd64](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_linux_amd64)
-
-windows:
-
-[mitm_windows_amd64.exe](https://github.com/lizongying/go-mitm/releases/download/v0.0.6/mitm_windows_amd64.exe)
-
-### Open the link
-
-访问链接 http://localhost:8083
-
-![image](./screenshot/img.png)
-![image](./screenshot/img_1.png)
-![image](./screenshot/img_4.png)
-![image](./screenshot/img_2.png)
-![image](./screenshot/img_3.png)
-
 ### Include & Exclude
 
 按行进行分割，其他请参考`-include`和`-exclude`参数定义
 
 ![image](./screenshot/img_11.png)
 
-### tips
+### Tips
 
-* 如果设置了代理，直连的时候依然使用代理。如果不需要代理，请清空代理。
+* 如果设置了代理，直连的时候依然会使用代理。如果不需要代理，请清空代理。
 
 ## Dev
 

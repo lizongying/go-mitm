@@ -33,6 +33,10 @@
         <template #title>Export</template>
         <ExportOutlined @click="out" class="hand"/>
       </a-tooltip>
+      <a-tooltip>
+        <template #title>Certificate</template>
+        <DownloadOutlined @click="certificate" class="hand"/>
+      </a-tooltip>
     </a-space>
     <a-modal v-model:open="openModal" :title="title" @ok="handleOk">
       <a-textarea v-if="title === 'Include'" v-model:value="include" placeholder="" :rows="4"/>
@@ -295,6 +299,7 @@
 <script setup>
 import {
   ClearOutlined,
+  DownloadOutlined,
   ExportOutlined,
   FilterOutlined,
   GatewayOutlined,
@@ -425,6 +430,10 @@ const columns = [
       {
         text: 'video',
         value: 'video',
+      },
+      {
+        text: 'font',
+        value: 'font',
       },
     ],
     onFilter: (value, record) => {
@@ -564,6 +573,37 @@ const activeKeyJava = ref([1])
 // clear data
 const clear = () => {
   data.value = []
+}
+
+const certificate = () => {
+  const file = new File([`-----BEGIN CERTIFICATE-----
+MIIC4TCCAcmgAwIBAgIBATANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDEwdHTy1N
+SVRNMB4XDTIzMDkxMTE0MzQ0NVoXDTMzMDkxMTE0MzQ0NVowEjEQMA4GA1UEAxMH
+R08tTUlUTTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAK0wrAupDXDu
+hQykEhV6WTNWL5GW9sA6k0dGM5lPceD6zvt3eBS6rfLboq4Bw4RQXXv+BQXVDiSa
+v/BH62RCxp/3EkSsj5JbeksZdxO42JqJ1hzVzEGwmNDBYy2vjKEnyS7z/PK8LOwS
+jDiaWkb+dc/7Ixomb50e3eT5WCxRoL/HVWaePSjV8FMmt2anDiicJEo0VJoF4A18
+Qme3ueXvFL6tbpCIHMr/BwpV7suuRS5/KyLlI12TOYQoomJn86Ru+TOENrD/Gb4B
+u9nXqAq3gr5Ke+akKxTNz/8Mxz8+08xGDQE/4YhkFy28v0kgwFmZOVLdzVNZSoRE
+lWPswBIpD6cCAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgKkMA8GA1UdEwEB/wQFMAMB
+Af8wHQYDVR0OBBYEFMDqagzu5CwpAlDc8RXIX5Dl8pZIMA0GCSqGSIb3DQEBCwUA
+A4IBAQCmbwUN4P5aqoGL0HwI9ZhX3PuEtixNL1+Ev33JvhbezqtvHFBjrZK/7TkF
+wRX9nHtcKP3vKT8Y+n/P5x9KXvicYwrLm2wF6iXhhdtUfFkbZi5ZtIurSWOaJbzV
+Sx2AOl6t2yrcR2wljme0dqVuPRLqMehglUhC/yQYqkg5CDnR6VkMCKcMb7UniVfX
+hVECMhnS/rMfXdNmnuHJJBUeD+FW67kfng4GyHPDWokziDtedaP/YDLL3k9g8ctG
+HXZ5VDduL8tIPTDbsRZIoXKfUQXi0Otr7XfruOTESuiy+ux8TQeAT2piLtchcRO0
+4FnakJzTJLa0wpgGR0iDPRNUPSML
+-----END CERTIFICATE-----`], 'ca.crt', {
+    type: 'text/csv',
+  });
+
+  const tmpLink = document.createElement('a')
+  const objectUrl = URL.createObjectURL(file)
+
+  tmpLink.href = objectUrl
+  tmpLink.download = file.name
+  tmpLink.click()
+  URL.revokeObjectURL(objectUrl)
 }
 
 // export data
