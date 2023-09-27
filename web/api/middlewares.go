@@ -14,7 +14,7 @@ func CrossDomain(next http.Handler) http.Handler {
 
 func Print(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		slog.Info(r.Method, "url", r.URL.String())
+		slog.Debug(r.Method, "api", r.URL.String())
 		next.ServeHTTP(w, r)
 	})
 }

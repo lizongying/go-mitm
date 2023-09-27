@@ -541,7 +541,7 @@ const getData = () => {
     // console.log('es open');
   };
   es.onmessage = event => {
-    console.log(event.data);
+    // console.log(event.data);
     data.value.unshift(JSON.parse(event.data))
     if (data.value.length > maxRow) {
       data.value = data.value.slice(0, maxRow)
@@ -676,7 +676,7 @@ const handleOk = () => {
 onBeforeMount(() => {
   info().then(response => {
     const info = response.data
-    console.log('info', info)
+    // console.log('info', info)
     isRecord.value = info.record
     include.value = info.include ? info.include.join('\n') : ''
     exclude.value = info.exclude ? info.exclude.join('\n') : ''

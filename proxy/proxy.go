@@ -716,7 +716,6 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		for _, v := range p.exclude {
 			matched, _ := filepath.Match(v, host)
 			if matched {
-				fmt.Println("exclude", host)
 				p.forward(w, r)
 				return
 			}

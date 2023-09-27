@@ -34,6 +34,12 @@
 
 下载相应平台的可执行文件并执行 [releases](https://github.com/lizongying/go-mitm/releases/)
 
+如
+```shell
+./mitm_darwin_arm64
+
+```
+
 参数:
 
 * -mid-port 指定中间人端口
@@ -100,6 +106,11 @@ windows:
 ### Tips
 
 * 如果设置了代理，直连的时候依然会使用代理。如果不需要代理，请清空代理。
+* permission denied 解决办法:
+```shell
+chmod +x mitm_darwin_arm64
+```
+* 
 
 ## Dev
 
@@ -128,3 +139,4 @@ make
 * java
 * middleware tmpdir save image/video
 * https proxy
+* replace
