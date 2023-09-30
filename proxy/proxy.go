@@ -341,13 +341,13 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 		}
 	}(r, response)
 }
-func (p *Proxy) handleHttps(w http.ResponseWriter, _ *http.Request) {
+func (p *Proxy) handleHttps(w http.ResponseWriter, r *http.Request) {
 	client, server := net.Pipe()
 	defer func() {
 		_ = client.Close()
 	}()
 
-	p.listener.AddConn(server)
+	p.listener.AddConn(NewConn(server, r.RemoteAddr))
 	_, _ = w.Write([]byte("HTTP/1.1 200 Connection Established\n\n"))
 
 	hijacker, ok := w.(http.Hijacker)

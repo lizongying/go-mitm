@@ -27,6 +27,8 @@ type Api struct {
 	fnSetProxy     func(proxy string) string
 	fnClearProxy   func() string
 	fnReplay       func(message Message)
+	lanIp          string
+	internetIp     string
 }
 
 func NewApi(messageChan chan *Message,
@@ -40,6 +42,8 @@ func NewApi(messageChan chan *Message,
 	fnSetProxy func(proxy string) string,
 	fnClearProxy func() string,
 	fnReplay func(message Message),
+	lanIp string,
+	internetIp string,
 ) (a *Api) {
 	a = new(Api)
 	a.mux = http.NewServeMux()
@@ -60,6 +64,8 @@ func NewApi(messageChan chan *Message,
 	a.fnSetProxy = fnSetProxy
 	a.fnClearProxy = fnClearProxy
 	a.fnReplay = fnReplay
+	a.lanIp = lanIp
+	a.internetIp = internetIp
 	return
 }
 
@@ -68,10 +74,12 @@ func (a *Api) Handler() http.Handler {
 }
 func (a *Api) info(w http.ResponseWriter, _ *http.Request) {
 	info := Info{
-		Record:  a.record,
-		Proxy:   a.proxy,
-		Exclude: a.exclude,
-		Include: a.include,
+		Record:     a.record,
+		Proxy:      a.proxy,
+		Exclude:    a.exclude,
+		Include:    a.include,
+		LanIp:      a.lanIp,
+		InternetIp: a.internetIp,
 	}
 	_, _ = w.Write([]byte(info.String()))
 	return

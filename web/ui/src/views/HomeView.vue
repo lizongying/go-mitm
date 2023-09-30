@@ -37,6 +37,8 @@
         <template #title>Certificate</template>
         <DownloadOutlined @click="certificate" class="hand"/>
       </a-tooltip>
+      <span>LAN IP: {{ lanIp }}</span>
+      <span>Internet IP: {{ internetIp }}</span>
     </a-space>
     <a-modal v-model:open="openModal" :title="title" @ok="handleOk">
       <a-textarea v-if="title === 'Include'" v-model:value="include" placeholder="" :rows="4"/>
@@ -533,7 +535,7 @@ const columns = [
 ];
 const data = ref([]);
 
-const maxRow = 15
+const maxRow = 50
 
 const getData = () => {
   const es = event()
@@ -673,6 +675,8 @@ const handleOk = () => {
   }
 }
 
+const lanIp = ref('')
+const internetIp = ref('')
 onBeforeMount(() => {
   info().then(response => {
     const info = response.data
@@ -680,7 +684,8 @@ onBeforeMount(() => {
     isRecord.value = info.record
     include.value = info.include ? info.include.join('\n') : ''
     exclude.value = info.exclude ? info.exclude.join('\n') : ''
-    proxy.value = info.proxy ? info.proxy : ''
+    lanIp.value = info.lan_ip ? info.lan_ip : ''
+    internetIp.value = info.internet_ip ? info.internet_ip : ''
   }).finally(_ => {
     if (isRecord.value) {
       getData()

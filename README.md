@@ -124,6 +124,8 @@ npm run --prefix ./web/ui dev
 
 curl -X POST "https://httpbin.org/post" -H "accept: application/json" --data '{"a":"xyz","b":"123"}' -x http://localhost:8082 --cacert ./static/tls/ca.crt
 
+curl "https://httpbin.org/get" -x http://192.168.31.171:8082 --cacert ./static/tls/ca.crt
+
 ```
 
 ### Build

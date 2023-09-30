@@ -17,6 +17,9 @@ func main() {
 	proxyPtr := flag.String("proxy", "", "-proxy proxy")
 	flag.Parse()
 
+	lanIp := proxy.LanIp()
+	internetIp := proxy.InternetIp()
+
 	var err error
 	messageChan := make(chan *api.Message, 255)
 
@@ -30,7 +33,7 @@ func main() {
 		Handler:      p,
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler)),
 	}
-	fmt.Printf("Mid: http://localhost:%d\n", *midPortPtr)
+	fmt.Printf("Mid: http://%s:%d http://%s:%d http://%s:%d\n", "localhost", *midPortPtr, lanIp, *midPortPtr, internetIp, *midPortPtr)
 	go func() {
 		err = midSrv.ListenAndServe()
 		if err != nil {
@@ -38,14 +41,14 @@ func main() {
 		}
 	}()
 
-	handler := api.NewApi(messageChan, p.Include(), p.SetInclude, p.ClearInclude, p.Exclude(), p.SetExclude, p.ClearExclude, p.Proxy(), p.SetProxy, p.ClearProxy, p.Replay).Handler()
+	handler := api.NewApi(messageChan, p.Include(), p.SetInclude, p.ClearInclude, p.Exclude(), p.SetExclude, p.ClearExclude, p.Proxy(), p.SetProxy, p.ClearProxy, p.Replay, lanIp, internetIp).Handler()
 	handler = api.CrossDomain(handler)
 	handler = api.Print(handler)
 	srvApi := &http.Server{
 		Addr:    fmt.Sprintf(":%d", *webPortPtr),
 		Handler: handler,
 	}
-	fmt.Printf("Web: http://localhost:%d\n", *webPortPtr)
+	fmt.Printf("Web: http://%s:%d http://%s:%d http://%s:%d\n", "localhost", *webPortPtr, lanIp, *webPortPtr, internetIp, *webPortPtr)
 	go func() {
 		err = srvApi.ListenAndServe()
 		if err != nil {
