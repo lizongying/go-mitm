@@ -15,13 +15,13 @@ import (
 	"fmt"
 	"github.com/andybalholm/brotli"
 	"github.com/lizongying/go-mitm/static"
-	"github.com/lizongying/go-mitm/web/api"
 	"io"
 	"log/slog"
 	"math/big"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -65,13 +65,14 @@ type Proxy struct {
 	srv          *http.Server
 	proxy        *url.URL
 	serialNumber int64
-	messageChan  chan *api.Message
+	messageChan  chan *Message
 	exclude      []string
 	include      []string
+	replace      [][]string
 	logger       *slog.Logger
 }
 
-func (p *Proxy) SetMessageChan(messageChan chan *api.Message) {
+func (p *Proxy) SetMessageChan(messageChan chan *Message) {
 	p.messageChan = messageChan
 }
 func (p *Proxy) getCertificate(domain string) (cert *tls.Certificate, err error) {
@@ -101,28 +102,30 @@ func (p *Proxy) getCertificate(domain string) (cert *tls.Certificate, err error)
 	}
 	return
 }
-func (p *Proxy) doReplace(w http.ResponseWriter, r *http.Request) {
-	_, _ = w.Write([]byte(fmt.Sprintf(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>%s</title>
-</head>
-<body>
-  %s
-</body>
-</html>
-`, r.Host, r.URL.String())))
-}
-func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Host == "" {
-		r.URL.Host = r.Host
+func (p *Proxy) doReplace1(w http.ResponseWriter, r *http.Request) {
+	t := http.DefaultTransport.(*http.Transport)
+	t.Proxy = func(_ *http.Request) (*url.URL, error) {
+		return p.proxy, nil
 	}
-	if r.URL.Scheme == "" {
-		r.URL.Scheme = "https"
+	response, err := t.RoundTrip(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusServiceUnavailable)
+		return
 	}
 
+	defer func() {
+		_ = response.Body.Close()
+	}()
+
+	w.WriteHeader(response.StatusCode)
+	copyHeader(w.Header(), response.Header)
+	_, _ = io.Copy(w, response.Body)
+}
+func (p *Proxy) doReplace2(w http.ResponseWriter, body []byte) {
+	w.WriteHeader(200)
+	_, _ = w.Write(body)
+}
+func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 	//fmt.Println(strings.Repeat("#", 100))
 	//fmt.Println("Request:")
 	//requestDump, err := httputil.DumpRequest(r, true)
@@ -323,7 +326,7 @@ func (p *Proxy) doRequest(w http.ResponseWriter, r *http.Request) {
 
 		//p.logger.Info("Response", "StatusCode", response.StatusCode, r.Method, r.URL.String(), "contentType", contentType)
 
-		p.messageChan <- &api.Message{
+		p.messageChan <- &Message{
 			Url:        r.URL.String(),
 			RemoteAddr: r.RemoteAddr,
 			Method:     r.Method,
@@ -497,6 +500,25 @@ func (p *Proxy) ClearExclude() []string {
 	p.exclude = make([]string, 0)
 	return p.exclude
 }
+func (p *Proxy) Replace() [][]string {
+	return p.replace
+}
+func (p *Proxy) SetReplace(replaces string) [][]string {
+	replace := make([][]string, 0)
+	for _, v := range strings.Split(replaces, ";") {
+		v = strings.TrimSpace(v)
+		if v == "" {
+			continue
+		}
+		replace = append(replace, strings.Split(v, ","))
+	}
+	p.replace = replace
+	return p.replace
+}
+func (p *Proxy) ClearReplace() [][]string {
+	p.replace = make([][]string, 0)
+	return p.replace
+}
 func (p *Proxy) Proxy() string {
 	if p.proxy == nil {
 		return ""
@@ -514,7 +536,7 @@ func (p *Proxy) ClearProxy() string {
 	p.proxy = nil
 	return ""
 }
-func (p *Proxy) Replay(message api.Message) {
+func (p *Proxy) Replay(message Message) {
 	r, err := http.NewRequest(message.Method, message.Url, strings.NewReader(message.ReqBody))
 	if err != nil {
 		return
@@ -689,7 +711,7 @@ func (p *Proxy) Replay(message api.Message) {
 
 		//p.logger.Info("Response", "StatusCode", response.StatusCode, r.Method, r.URL.String(), "contentType", contentType)
 
-		p.messageChan <- &api.Message{
+		p.messageChan <- &Message{
 			Url:        r.URL.String(),
 			RemoteAddr: r.RemoteAddr,
 			Method:     r.Method,
@@ -742,11 +764,30 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodConnect {
 		p.handleHttps(w, r)
 	} else {
-		if false {
-			p.doReplace(w, r)
-		} else {
-			p.doRequest(w, r)
+		if r.URL.Host == "" {
+			r.URL.Host = r.Host
 		}
+		if r.URL.Scheme == "" {
+			r.URL.Scheme = "https"
+		}
+		for _, v := range p.replace {
+			if ok, _ := filepath.Match(v[0], r.URL.String()); ok {
+				if v[1] == "https://" || v[1] == "http://" {
+					r, err := http.NewRequest("GET", v[2], nil)
+					if err == nil {
+						p.doReplace1(w, r)
+					}
+				}
+				if v[1] == "file://" {
+					data, err := os.ReadFile("/" + v[2])
+					if err == nil {
+						p.doReplace2(w, data)
+					}
+				}
+				return
+			}
+		}
+		p.doRequest(w, r)
 	}
 }
 

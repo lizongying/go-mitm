@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/lizongying/go-mitm/proxy"
 	"github.com/lizongying/go-mitm/static"
 	"io/fs"
 	"log"
@@ -15,35 +16,16 @@ type Api struct {
 	id          uint64
 	client      uint64
 	mux         *http.ServeMux
-	messageChan chan *Message
-
-	include        []string
-	fnSetInclude   func(include string) []string
-	fnClearInclude func() []string
-	exclude        []string
-	fnSetExclude   func(exclude string) []string
-	fnClearExclude func() []string
-	proxy          string
-	fnSetProxy     func(proxy string) string
-	fnClearProxy   func() string
-	fnReplay       func(message Message)
-	lanIp          string
-	internetIp     string
+	messageChan chan *proxy.Message
+	lanIp       string
+	internetIp  string
+	server      *proxy.Proxy
 }
 
-func NewApi(messageChan chan *Message,
-	include []string,
-	fnSetInclude func(include string) []string,
-	fnClearInclude func() []string,
-	exclude []string,
-	fnSetExclude func(exclude string) []string,
-	fnClearExclude func() []string,
-	proxy string,
-	fnSetProxy func(proxy string) string,
-	fnClearProxy func() string,
-	fnReplay func(message Message),
+func NewApi(messageChan chan *proxy.Message,
 	lanIp string,
 	internetIp string,
+	server *proxy.Proxy,
 ) (a *Api) {
 	a = new(Api)
 	a.mux = http.NewServeMux()
@@ -54,18 +36,9 @@ func NewApi(messageChan chan *Message,
 	a.mux.HandleFunc("/action", a.action)
 	a.record = true
 	a.messageChan = messageChan
-	a.include = include
-	a.fnSetInclude = fnSetInclude
-	a.fnClearInclude = fnClearInclude
-	a.exclude = exclude
-	a.fnSetExclude = fnSetExclude
-	a.fnClearExclude = fnClearExclude
-	a.proxy = proxy
-	a.fnSetProxy = fnSetProxy
-	a.fnClearProxy = fnClearProxy
-	a.fnReplay = fnReplay
 	a.lanIp = lanIp
 	a.internetIp = internetIp
+	a.server = server
 	return
 }
 
@@ -75,11 +48,12 @@ func (a *Api) Handler() http.Handler {
 func (a *Api) info(w http.ResponseWriter, _ *http.Request) {
 	info := Info{
 		Record:     a.record,
-		Proxy:      a.proxy,
-		Exclude:    a.exclude,
-		Include:    a.include,
+		Proxy:      a.server.Proxy(),
+		Exclude:    a.server.Exclude(),
+		Include:    a.server.Include(),
 		LanIp:      a.lanIp,
 		InternetIp: a.internetIp,
+		Replace:    a.server.Replace(),
 	}
 	_, _ = w.Write([]byte(info.String()))
 	return
@@ -92,36 +66,45 @@ func (a *Api) action(_ http.ResponseWriter, r *http.Request) {
 	}
 	replay := r.URL.Query().Get("replay")
 	if replay != "" {
-		var message Message
+		var message proxy.Message
 		_ = json.Unmarshal([]byte(replay), &message)
-		a.fnReplay(message)
+		a.server.Replay(message)
 		return
 	}
 	exclude := r.URL.Query().Get("exclude")
 	if exclude != "" {
 		if exclude == "-" {
-			a.exclude = a.fnClearExclude()
+			a.server.ClearExclude()
 			return
 		}
-		a.exclude = a.fnSetExclude(exclude)
+		a.server.SetExclude(exclude)
 		return
 	}
 	include := r.URL.Query().Get("include")
 	if include != "" {
 		if include == "-" {
-			a.exclude = a.fnClearInclude()
+			a.server.ClearInclude()
 			return
 		}
-		a.include = a.fnSetInclude(include)
+		a.server.SetInclude(include)
 		return
 	}
-	proxy := r.URL.Query().Get("proxy")
-	if proxy != "" {
-		if proxy == "-" {
-			a.proxy = a.fnClearProxy()
+	p := r.URL.Query().Get("proxy")
+	if p != "" {
+		if p == "-" {
+			a.server.ClearProxy()
 			return
 		}
-		a.proxy = a.fnSetProxy(proxy)
+		a.server.SetProxy(p)
+		return
+	}
+	replace := r.URL.Query().Get("replace")
+	if replace != "" {
+		if replace == "-" {
+			a.server.ClearReplace()
+			return
+		}
+		a.server.SetReplace(replace)
 		return
 	}
 	return

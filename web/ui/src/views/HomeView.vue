@@ -30,6 +30,10 @@
         <GatewayOutlined @click="filter('Proxy')" class="hand"/>
       </a-tooltip>
       <a-tooltip>
+        <template #title>Replace</template>
+        <DiffOutlined @click="filter('Replace')" class="hand"/>
+      </a-tooltip>
+      <a-tooltip>
         <template #title>Export</template>
         <ExportOutlined @click="out" class="hand"/>
       </a-tooltip>
@@ -44,6 +48,40 @@
       <a-textarea v-if="title === 'Include'" v-model:value="include" placeholder="" :rows="4"/>
       <a-textarea v-if="title === 'Exclude'" v-model:value="exclude" placeholder="" :rows="4"/>
       <a-input v-if="title === 'Proxy'" v-model:value="proxy" placeholder=""/>
+      <a-space
+          v-if="title === 'Replace'"
+          v-for="(ruler, index) in rulers"
+          :key="ruler.id"
+          style="display: flex; margin-bottom: 8px"
+          align="baseline"
+      >
+        <a-input-group compact>
+          <a-input v-model:value="ruler.from" :status="ruler.fromError" :placeholder="ruler.fromPlaceholder"
+                   @change="fromChange(ruler)"
+                   style="width: 35%">
+          </a-input>
+          <a-input v-model:value="ruler.to" :status="ruler.toError" :placeholder="ruler.toPlaceholder"
+                   @change="toChange(ruler)"
+                   style="width: 65%">
+            <template #addonBefore>
+              <a-select v-model:value="ruler.type" style="width: 93.4px">
+                <a-select-option value="https://">https://</a-select-option>
+                <a-select-option value="http://">http://</a-select-option>
+                <a-select-option value="file://">file://</a-select-option>
+              </a-select>
+            </template>
+            <template #addonAfter>
+              <MinusCircleOutlined @click="removeRuler(ruler)"/>
+            </template>
+          </a-input>
+        </a-input-group>
+      </a-space>
+      <a-form-item v-if="title === 'Replace'">
+        <a-button type="dashed" block @click="addRuler">
+          <PlusOutlined/>
+          Add Ruler
+        </a-button>
+      </a-form-item>
     </a-modal>
     <a-table :columns="columns"
              :data-source="data"
@@ -301,11 +339,14 @@
 <script setup>
 import {
   ClearOutlined,
+  DiffOutlined,
   DownloadOutlined,
   ExportOutlined,
   FilterOutlined,
   GatewayOutlined,
+  MinusCircleOutlined,
   MinusSquareOutlined,
+  PlusOutlined,
   PlusSquareOutlined,
   PoweroffOutlined,
   ReloadOutlined,
@@ -335,6 +376,7 @@ import {toJavaHttpClient} from "@/converter/toJavaHttpClient";
 import {toJavaJsoup} from "@/converter/toJavaJsoup";
 import {toJavaApacheHttpClient} from "@/converter/toJavaApacheHttpClient";
 import {toJavaOkHttp} from "@/converter/toJavaOkHttp";
+import {notification} from "ant-design-vue";
 
 // record
 const isRecord = ref(true)
@@ -632,6 +674,41 @@ const include = ref('')
 const exclude = ref('')
 const proxy = ref('')
 
+const rulers = reactive([])
+const removeRuler = item => {
+  const index = rulers.indexOf(item);
+  if (index !== -1) {
+    rulers.splice(index, 1);
+  }
+  doReplace()
+};
+const addRuler = () => {
+  rulers.push({
+    from: '',
+    fromError: '',
+    fromPlaceholder: '',
+    to: '',
+    toError: '',
+    toPlaceholder: '',
+    type: 'https://',
+    id: Date.now(),
+  });
+};
+const fromChange = ruler => {
+  if (ruler.from !== '') {
+    ruler.fromError = ''
+  } else {
+    ruler.fromError = 'error'
+  }
+}
+const toChange = ruler => {
+  if (ruler.to !== '') {
+    ruler.toError = ''
+  } else {
+    ruler.toError = 'error'
+  }
+}
+
 const openModal = ref(false);
 const filter = (t) => {
   title.value = t
@@ -673,6 +750,46 @@ const handleOk = () => {
       proxy: proxyStr
     }).finally(openModal.value = false)
   }
+  if (title.value === 'Replace') {
+    doReplace()
+  }
+}
+
+const doReplace = () => {
+  let arr = []
+  let err = false
+  rulers.forEach((v) => {
+    if (v.from === "") {
+      v.fromError = 'error'
+      err = true
+    }
+    if (v.to === "") {
+      v.toError = 'error'
+      err = true
+    }
+    if (err) {
+      return
+    }
+    arr.push(`${v.from},${v.type}${v.to}`)
+  })
+  if (err) {
+    notification.warning({
+      message: 'warning'
+    })
+    return
+  }
+  let show = arr.join(";").trim()
+  if (show === "") {
+    show = "-"
+  }
+  action({
+    replace: show
+  }).finally(() => {
+        notification.success({
+          message: 'success'
+        })
+      }
+  )
 }
 
 const lanIp = ref('')

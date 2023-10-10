@@ -21,7 +21,7 @@ func main() {
 	internetIp := proxy.InternetIp()
 
 	var err error
-	messageChan := make(chan *api.Message, 255)
+	messageChan := make(chan *proxy.Message, 255)
 
 	p, err := proxy.NewProxy(*includePtr, *excludePtr, *proxyPtr)
 	if err != nil {
@@ -41,7 +41,7 @@ func main() {
 		}
 	}()
 
-	handler := api.NewApi(messageChan, p.Include(), p.SetInclude, p.ClearInclude, p.Exclude(), p.SetExclude, p.ClearExclude, p.Proxy(), p.SetProxy, p.ClearProxy, p.Replay, lanIp, internetIp).Handler()
+	handler := api.NewApi(messageChan, lanIp, internetIp, p).Handler()
 	handler = api.CrossDomain(handler)
 	handler = api.Print(handler)
 	srvApi := &http.Server{

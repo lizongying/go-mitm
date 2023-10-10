@@ -13,7 +13,8 @@
     3. [Install certificate](#Install-certificate)
     4. [Set the proxy](#Set-the-proxy)
     5. [Include & Exclude](#Include--Exclude)
-    6. [Tips](#Tips)
+    6. [Replace](#Replace)
+    7. [Tips](#Tips)
 3. [Dev](#Dev)
 4. [TODO](#TODO)
 
@@ -35,6 +36,7 @@
 下载相应平台的可执行文件并执行 [releases](https://github.com/lizongying/go-mitm/releases/)
 
 如
+
 ```shell
 ./mitm_darwin_arm64
 
@@ -103,14 +105,22 @@ windows:
 
 ![image](./screenshot/img_11.png)
 
+### Replace
+
+替换成指定网址（https://、http://），替换成本地文件（file://）
+
+![image](./screenshot/img_15.png)
+
 ### Tips
 
 * 如果设置了代理，直连的时候依然会使用代理。如果不需要代理，请清空代理。
 * permission denied 解决办法:
+
 ```shell
 chmod +x mitm_darwin_arm64
 ```
-* 
+
+*
 
 ## Dev
 
