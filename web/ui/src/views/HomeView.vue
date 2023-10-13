@@ -50,7 +50,7 @@
       <a-input v-if="title === 'Proxy'" v-model:value="proxy" placeholder=""/>
       <a-space
           v-if="title === 'Replace'"
-          v-for="(ruler, index) in rulers"
+          v-for="(ruler) in rulers"
           :key="ruler.id"
           style="display: flex; margin-bottom: 8px"
           align="baseline"
@@ -354,24 +354,24 @@ import {
   SearchOutlined
 } from '@ant-design/icons-vue';
 import {onBeforeMount, reactive, ref} from 'vue'
-import {action, event, info} from '../request/api'
-import {formatHexDump} from '../utils'
+import {action, event, info} from '@/request/api'
+import {formatHexDump} from '@/utils'
 import PreviewCode from '../components/PreviewCode.vue'
 import PreviewHeader from "../components/PreviewHeader.vue";
-import {toCurl} from "../converter/toCurl";
-import {toJsJQuery} from "../converter/toJsJQuery";
-import {toJsXhr} from "../converter/toJsXhr";
-import {toJsFetch} from "../converter/toJsFetch";
-import {toJsAxios} from "../converter/toJsAxios";
-import {toGoHttpClient} from "../converter/toGoHttpClient";
-import {toGoGoCrawler} from "../converter/toGoGoCrawler";
-import {toPHPcURL} from "../converter/toPHPcURL";
-import {toPHPGuzzle} from "../converter/toPHPGuzzle";
-import {toPyRequests} from "../converter/toPyRequests";
-import {toPyurllib3} from "../converter/toPyurllib3";
-import {toPyurllib} from "../converter/toPyurllib";
-import {toPyaiohttp} from "../converter/toPyaiohttp";
-import {toPyhttpx} from "../converter/toPyhttpx";
+import {toCurl} from "@/converter/toCurl";
+import {toJsJQuery} from "@/converter/toJsJQuery";
+import {toJsXhr} from "@/converter/toJsXhr";
+import {toJsFetch} from "@/converter/toJsFetch";
+import {toJsAxios} from "@/converter/toJsAxios";
+import {toGoHttpClient} from "@/converter/toGoHttpClient";
+import {toGoGoCrawler} from "@/converter/toGoGoCrawler";
+import {toPHPcURL} from "@/converter/toPHPcURL";
+import {toPHPGuzzle} from "@/converter/toPHPGuzzle";
+import {toPyRequests} from "@/converter/toPyRequests";
+import {toPyurllib3} from "@/converter/toPyurllib3";
+import {toPyurllib} from "@/converter/toPyurllib";
+import {toPyaiohttp} from "@/converter/toPyaiohttp";
+import {toPyhttpx} from "@/converter/toPyhttpx";
 import {toJavaHttpClient} from "@/converter/toJavaHttpClient";
 import {toJavaJsoup} from "@/converter/toJavaJsoup";
 import {toJavaApacheHttpClient} from "@/converter/toJavaApacheHttpClient";
