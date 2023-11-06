@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	handler := api.NewApi(nil, "", "", nil).Handler()
+	handler := api.NewApi(nil, "", "", 8082, nil).Handler()
 	handler = api.CrossDomain(handler)
 	srv := &http.Server{
 		Addr:    ":8083",

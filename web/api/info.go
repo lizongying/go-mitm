@@ -9,6 +9,7 @@ type Info struct {
 	Include    []string   `json:"include,omitempty"`
 	LanIp      string     `json:"lan_ip,omitempty"`
 	InternetIp string     `json:"internet_ip,omitempty"`
+	ProxyPort  int        `json:"proxy_port,omitempty"`
 	Replace    [][]string `json:"replace,omitempty"`
 }
 

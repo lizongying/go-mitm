@@ -45,8 +45,7 @@
         <template #title>Question</template>
         <QuestionOutlined @click="filter('Question')" class="hand"/>
       </a-tooltip>
-      <span>LAN IP: {{ lanIp }}</span>
-      <span>Internet IP: {{ internetIp }}</span>
+      <span>proxy: {{ lanIp }}:{{ proxyPort }} / {{ internetIp }}:{{ proxyPort }}</span>
     </a-space>
     <a-modal v-model:open="openModal" :title="title" @ok="handleOk">
       <a-textarea v-if="title === 'Include'" v-model:value="include" placeholder="" :rows="4"/>
@@ -812,6 +811,7 @@ const doReplace = () => {
 
 const lanIp = ref('')
 const internetIp = ref('')
+const proxyPort = ref(0)
 onBeforeMount(() => {
   info().then(response => {
     const info = response.data
@@ -820,8 +820,9 @@ onBeforeMount(() => {
     include.value = info.include ? info.include.join('\n') : ''
     exclude.value = info.exclude ? info.exclude.join('\n') : ''
     lanIp.value = info.lan_ip ? info.lan_ip : ''
-    q4.value = `export HTTP_PROXY=http://${lanIp.value}:8082 && export HTTPS_PROXY=http://${lanIp.value}:8082`
-    q3.value = `curl "https://httpbin.org/get" -x http://${lanIp.value}:8082 --cacert ./ca.crt`
+    proxyPort.value = info.proxy_port ? info.proxy_port : ''
+    q4.value = `export HTTP_PROXY=http://${lanIp.value}:${proxyPort.value} && export HTTPS_PROXY=http://${lanIp.value}:${proxyPort.value}`
+    q3.value = `curl "https://httpbin.org/get" -x http://${lanIp.value}:${proxyPort.value} --cacert ./ca.crt`
     internetIp.value = info.internet_ip ? info.internet_ip : ''
   }).finally(_ => {
     if (isRecord.value) {

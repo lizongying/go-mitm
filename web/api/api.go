@@ -19,12 +19,14 @@ type Api struct {
 	messageChan chan *proxy.Message
 	lanIp       string
 	internetIp  string
+	proxyPort   int
 	server      *proxy.Proxy
 }
 
 func NewApi(messageChan chan *proxy.Message,
 	lanIp string,
 	internetIp string,
+	proxyPort int,
 	server *proxy.Proxy,
 ) (a *Api) {
 	a = new(Api)
@@ -38,6 +40,7 @@ func NewApi(messageChan chan *proxy.Message,
 	a.messageChan = messageChan
 	a.lanIp = lanIp
 	a.internetIp = internetIp
+	a.proxyPort = proxyPort
 	a.server = server
 	return
 }
@@ -53,6 +56,7 @@ func (a *Api) info(w http.ResponseWriter, _ *http.Request) {
 		Include:    a.server.Include(),
 		LanIp:      a.lanIp,
 		InternetIp: a.internetIp,
+		ProxyPort:  a.proxyPort,
 		Replace:    a.server.Replace(),
 	}
 	_, _ = w.Write([]byte(info.String()))

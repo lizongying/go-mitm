@@ -41,7 +41,7 @@ func main() {
 		}
 	}()
 
-	handler := api.NewApi(messageChan, lanIp, internetIp, p).Handler()
+	handler := api.NewApi(messageChan, lanIp, internetIp, *midPortPtr, p).Handler()
 	handler = api.CrossDomain(handler)
 	handler = api.Print(handler)
 	srvApi := &http.Server{
