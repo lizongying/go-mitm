@@ -7,7 +7,7 @@ const action = params => {
     });
 };
 
-const info = _ => {
+const info = () => {
     return axios.get(host + '/info')
 };
 

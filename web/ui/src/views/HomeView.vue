@@ -38,8 +38,12 @@
         <ExportOutlined @click="out" class="hand"/>
       </a-tooltip>
       <a-tooltip>
-        <template #title>Certificate</template>
+        <template #title>Download Certificate</template>
         <DownloadOutlined @click="certificate" class="hand"/>
+      </a-tooltip>
+      <a-tooltip>
+        <template #title>Question</template>
+        <QuestionOutlined @click="filter('Question')" class="hand"/>
       </a-tooltip>
       <span>LAN IP: {{ lanIp }}</span>
       <span>Internet IP: {{ internetIp }}</span>
@@ -82,6 +86,19 @@
           Add Ruler
         </a-button>
       </a-form-item>
+      <a-list v-if="title === 'Question'" item-layout="horizontal" :data-source="dataQuestion">
+        <template #renderItem="{ item }">
+          <a-list-item>
+            <a-list-item-meta
+                :description="item.question"
+            >
+              <template #title>
+                <span>{{ item.ask }}</span>
+              </template>
+            </a-list-item-meta>
+          </a-list-item>
+        </template>
+      </a-list>
     </a-modal>
     <a-table :columns="columns"
              :data-source="data"
@@ -349,6 +366,7 @@ import {
   PlusOutlined,
   PlusSquareOutlined,
   PoweroffOutlined,
+  QuestionOutlined,
   ReloadOutlined,
   RightOutlined,
   SearchOutlined
@@ -802,6 +820,8 @@ onBeforeMount(() => {
     include.value = info.include ? info.include.join('\n') : ''
     exclude.value = info.exclude ? info.exclude.join('\n') : ''
     lanIp.value = info.lan_ip ? info.lan_ip : ''
+    q4.value = `export HTTP_PROXY=http://${lanIp.value}:8082 && export HTTPS_PROXY=http://${lanIp.value}:8082`
+    q3.value = `curl "https://httpbin.org/get" -x http://${lanIp.value}:8082 --cacert ./ca.crt`
     internetIp.value = info.internet_ip ? info.internet_ip : ''
   }).finally(_ => {
     if (isRecord.value) {
@@ -809,6 +829,28 @@ onBeforeMount(() => {
     }
   })
 })
+
+const q3 = ref('')
+const q4 = ref('')
+const dataQuestion = reactive([
+  {
+    ask: '为什么请求没有被记录？',
+    question: '1. 请检查Exclude中是否被排除，默认排除目标域名是localhost、127.0.0.1的请求。'
+  },
+  {
+    ask: '支持https请求吗？',
+    question: '请在Download Certificate中下载证书，安装并信任。'
+  },
+  {
+    ask: '如何在curl中使用代理？',
+    question: q3
+  },
+  {
+    ask: '如何在terminal中使用代理？',
+    question: q4
+  },
+]);
+
 </script>
 
 <style scoped>
